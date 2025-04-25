@@ -18,7 +18,8 @@ import {
   Download,
   MessageSquare,
   ListChecks,
-  User
+  User,
+  Lightbulb,
 } from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
@@ -124,6 +125,12 @@ const ResumePage = () => {
     }
   };
 
+  const jobDescriptionExamples = [
+    "Software Engineer with 3+ years of experience in React and Node.js.",
+    "Data Scientist proficient in Python, machine learning, and data visualization.",
+    "Marketing Manager with a proven track record in digital marketing and SEO."
+  ];
+
   const renderUploadArea = () => (
     <motion.div
       {...getRootProps()}
@@ -155,6 +162,13 @@ const ResumePage = () => {
         value={jobDescription}
         onChange={e => setJobDescription(e.target.value)}
       />
+      <div className="mt-2 space-x-2">
+        {jobDescriptionExamples.map(example => (
+          <Button variant="outline" size="sm" key={example} onClick={() => setJobDescription(example)}>
+            {example.substring(0, 30)}...
+          </Button>
+        ))}
+      </div>
     </motion.div>
   );
 
@@ -166,31 +180,37 @@ const ResumePage = () => {
           <CardDescription>Review the analysis and suggestions to improve your resume.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Accordion type="single" collapsible>
-            <AccordionItem value="atsCompatibility">
-              <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
-              <AccordionContent>
-                This score reflects how well your resume is likely to be parsed by Applicant Tracking Systems.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="suggestions">
-              <AccordionTrigger>Suggestions</AccordionTrigger>
-              <AccordionContent>
-                {analysis.suggestions.map((suggestion, index) => (
-                  <li key={index} className="list-disc ml-4">{suggestion}</li>
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="tailoredSummary">
-              <AccordionTrigger>Tailored Summary</AccordionTrigger>
-              <AccordionContent>
-                {analysis.tailoredSummary}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          {analysis ? (
+            <>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="atsCompatibility">
+                  <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
+                  <AccordionContent>
+                    This score reflects how well your resume is likely to be parsed by Applicant Tracking Systems.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="suggestions">
+                  <AccordionTrigger>Suggestions</AccordionTrigger>
+                  <AccordionContent>
+                    {analysis.suggestions.map((suggestion, index) => (
+                      <li key={index} className="list-disc ml-4">{suggestion}</li>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="tailoredSummary">
+                  <AccordionTrigger>Tailored Summary</AccordionTrigger>
+                  <AccordionContent>
+                    {analysis.tailoredSummary}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
+            </>
+          ) : (
+            <p>No analysis available.</p>
+          )}
         </CardContent>
       </Card>
-      <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
     </motion.div>
   );
 
