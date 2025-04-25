@@ -4,7 +4,7 @@ import React, {useState, useCallback} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
-import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle, CardDescription} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {optimizeResume} from '@/ai/flows/optimize-resume';
 import {useToast} from '@/hooks/use-toast';
@@ -14,7 +14,15 @@ import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
 import {motion} from 'framer-motion';
 import {Progress} from "@/components/ui/progress";
-import {SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton} from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
 const ResumePage = () => {
   const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
@@ -106,7 +114,11 @@ const ResumePage = () => {
   };
 
   const renderUploadArea = () => (
-    <div {...getRootProps()} className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent">
+    <motion.div
+      {...getRootProps()}
+      className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
+      whileHover={{scale: 1.05}}
+    >
       <input {...getInputProps()} />
       {isDragActive ? (
         <p className="text-lg text-muted-foreground">Drop the files here ...</p>
@@ -122,33 +134,53 @@ const ResumePage = () => {
           <Progress value={uploadProgress}/>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 
   const renderJobDescriptionArea = () => (
-    <div className="mt-4">
+    <motion.div className="mt-4" initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
       <Textarea
         placeholder="Enter job description"
         value={jobDescription}
         onChange={e => setJobDescription(e.target.value)}
       />
-    </div>
+    </motion.div>
   );
 
   const renderResults = () => (
-    <>
+    <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
       <Card className="mt-4">
         <CardHeader>
           <CardTitle>Analysis Results</CardTitle>
+          <CardDescription>Review the analysis and suggestions to improve your resume.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p>ATS Compatibility Score: {analysis.atsCompatibilityScore}</p>
-          <p>Suggestions: {analysis.suggestions.join(', ')}</p>
-          <p>Tailored Summary: {analysis.tailoredSummary}</p>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="atsCompatibility">
+              <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
+              <AccordionContent>
+                This score reflects how well your resume is likely to be parsed by Applicant Tracking Systems.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="suggestions">
+              <AccordionTrigger>Suggestions</AccordionTrigger>
+              <AccordionContent>
+                {analysis.suggestions.map((suggestion, index) => (
+                  <li key={index} className="list-disc ml-4">{suggestion}</li>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="tailoredSummary">
+              <AccordionTrigger>Tailored Summary</AccordionTrigger>
+              <AccordionContent>
+                {analysis.tailoredSummary}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
       </Card>
       <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
-    </>
+    </motion.div>
   );
 
   return (
@@ -163,37 +195,75 @@ const ResumePage = () => {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/interview">
+                <MessageSquare className="w-4 h-4"/>
                 Interview
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/resume">
+                <File className="w-4 h-4"/>
                 Resume
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/jobs">
+                <ListChecks className="w-4 h-4"/>
                 Jobs
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/progress">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-bar-chart-4"
+                >
+                  <path d="M3 3v18h18"/>
+                  <path d="M7 11V5"/>
+                  <path d="M11 19V8"/>
+                  <path d="M15 15V3"/>
+                  <path d="M19 10v5"/>
+                </svg>
                 Progress
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/profile">
+                <User className="w-4 h-4"/>
                 Profile
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/settings">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-settings"
+                >
+                  <path
+                    d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
+                </svg>
                 Settings
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
+
       <div className="container mx-auto py-8">
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
