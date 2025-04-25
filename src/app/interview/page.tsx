@@ -8,13 +8,12 @@ import {generateInterviewQuestions} from '@/ai/flows/generate-interview-question
 import {AnalyzeInterviewResponseInput, analyzeInterviewResponse} from '@/ai/flows/analyze-interview-response';
 import {useToast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
-import {ArrowLeft, RotateCw} from 'lucide-react';
+import {ArrowLeft, RotateCw, Lightbulb, CheckCircle2, HelpCircle} from 'lucide-react';
 import {Input} from '@/components/ui/input';
 import {motion} from 'framer-motion';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Slider} from '@/components/ui/slider';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {CheckCircle2, HelpCircle, Lightbulb} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
 import {
@@ -26,6 +25,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import {File, ListChecks, MessageSquare, User} from "lucide-react";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');

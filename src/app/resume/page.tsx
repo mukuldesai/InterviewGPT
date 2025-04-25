@@ -33,6 +33,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 const ResumePage = () => {
   const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
@@ -41,7 +42,7 @@ const ResumePage = () => {
   const {toast} = useToast();
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [analysisStep, setAnalysisStep] = useState<'upload' | 'analyze' | 'results'>('upload');
+  const [analysisStep, setAnalysisStep<'upload' | 'analyze' | 'results'>('upload');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
