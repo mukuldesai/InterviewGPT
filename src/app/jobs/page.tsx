@@ -237,24 +237,24 @@ const JobsPage = () => {
       
         
           
-            <SidebarMenuButton href="/">
+            <SidebarMenuButton href="/" >
               Home
             </SidebarMenuButton>
           
           
-            <SidebarMenuButton href="/interview">
-              <MessageSquare  className="w-4 h-4"/>
+            
+              <MessageSquare className="w-4 h-4"/>
               Interview
             </SidebarMenuButton>
           
           
-            <SidebarMenuButton href="/resume">
+            
               <FileIcon className="w-4 h-4"/>
               Resume
             </SidebarMenuButton>
           
           
-            <SidebarMenuButton href="/jobs">
+            
               <ListChecks className="w-4 h-4"/>
               Jobs
             </SidebarMenuButton>
@@ -272,7 +272,7 @@ const JobsPage = () => {
             </SidebarMenuButton>
           
           
-            <SidebarMenuButton href="/profile">
+            
               <User className="w-4 h-4"/>
               Profile
             </SidebarMenuButton>
@@ -303,7 +303,7 @@ const JobsPage = () => {
             {/* Main search bar */}
             <div className="primary-search">
               <div className="search-input-container">
-                <SearchIcon className="search-icon"/>
+                
                 <Input
                   type="text"
                   placeholder="Job title, skills, or keywords"
@@ -314,7 +314,7 @@ const JobsPage = () => {
               </div>
 
               <div className="location-input-container">
-                <LocationPinIcon className="location-icon"/>
+                
                 <Input
                   type="text"
                   placeholder="City, state, or remote"
@@ -848,10 +848,3 @@ function CircularProgress({value}) {
     
   );
 };
-
-
-
-
-
-
-
