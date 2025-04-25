@@ -14,6 +14,7 @@ import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
 import {motion} from 'framer-motion';
 import {Progress} from "@/components/ui/progress";
+import {SidebarProvider, Sidebar, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton} from "@/components/ui/sidebar";
 
 const ResumePage = () => {
   const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
@@ -151,41 +152,84 @@ const ResumePage = () => {
   );
 
   return (
-    <div className="container mx-auto py-8">
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold">Resume Analysis</CardTitle>
-            <Button variant="ghost" onClick={handleBackToHome}>
-              <ArrowLeft className="mr-2"/>
-              Back to Home
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">{getAnalysisStepLabel()}</p>
-        </CardHeader>
-        <CardContent>
-          {analysisStep === 'upload' && renderUploadArea()}
-          {analysisStep === 'analyze' && (
-            <>
-              {renderJobDescriptionArea()}
-              <Button onClick={handleAnalyzeResume} disabled={isAnalyzing} className="mt-4">
-                {isAnalyzing ? (
-                  <>
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="mr-2 h-4 w-4"/>
-                    Analyze Resume
-                  </>
-                )}
+    <SidebarProvider>
+      <Sidebar collapsible="icon">
+        <SidebarContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/">
+                Home
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/interview">
+                Interview
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/resume">
+                Resume
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/jobs">
+                Jobs
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/progress">
+                Progress
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/profile">
+                Profile
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/settings">
+                Settings
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+      </Sidebar>
+      <div className="container mx-auto py-8">
+        <Card className="w-full max-w-4xl mx-auto">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl font-bold">Resume Analysis</CardTitle>
+              <Button variant="ghost" onClick={handleBackToHome}>
+                <ArrowLeft className="mr-2"/>
+                Back to Home
               </Button>
-            </>
-          )}
-          {analysisStep === 'results' && analysis && renderResults()}
-        </CardContent>
-      </Card>
-    </div>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{getAnalysisStepLabel()}</p>
+          </CardHeader>
+          <CardContent>
+            {analysisStep === 'upload' && renderUploadArea()}
+            {analysisStep === 'analyze' && (
+              <>
+                {renderJobDescriptionArea()}
+                <Button onClick={handleAnalyzeResume} disabled={isAnalyzing} className="mt-4">
+                  {isAnalyzing ? (
+                    <>
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-4 w-4"/>
+                      Analyze Resume
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
+            {analysisStep === 'results' && analysis && renderResults()}
+          </CardContent>
+        </Card>
+      </div>
+    </SidebarProvider>
   );
 };
 
