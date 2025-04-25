@@ -134,36 +134,38 @@ const InterviewPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <Input
-              type="text"
-              placeholder="Enter Job Role"
-              value={jobRole}
-              onChange={e => setJobRole(e.target.value)}
-            />
+          <section className="mb-6">
+            <h2 className="text-xl font-semibold mb-2">Customize Your Practice</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                type="text"
+                placeholder="Enter Job Role"
+                value={jobRole}
+                onChange={e => setJobRole(e.target.value)}
+              />
 
-            <Select onValueChange={setExperienceLevel}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Experience Level"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Entry-level">Entry-level</SelectItem>
-                <SelectItem value="Mid-level">Mid-level</SelectItem>
-                <SelectItem value="Senior-level">Senior-level</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button onClick={handleGenerateQuestions} disabled={isLoading} className="mb-4">
-            {isLoading ? (
-              <>
-                <RotateCw className="mr-2 h-4 w-4 animate-spin"/>
-                Generating Questions...
-              </>
-            ) : (
-              'Generate Interview Questions'
-            )}
-          </Button>
+              <Select onValueChange={setExperienceLevel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Experience Level"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Entry-level">Entry-level</SelectItem>
+                  <SelectItem value="Mid-level">Mid-level</SelectItem>
+                  <SelectItem value="Senior-level">Senior-level</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleGenerateQuestions} disabled={isLoading} className="mt-4">
+              {isLoading ? (
+                <>
+                  <RotateCw className="mr-2 h-4 w-4 animate-spin"/>
+                  Generating Questions...
+                </>
+              ) : (
+                'Generate Interview Questions'
+              )}
+            </Button>
+          </section>
 
           {generatedQuestions.length > 0 && (
             <motion.div
