@@ -20,6 +20,7 @@ import {
   ListChecks,
   User,
   Lightbulb,
+  RotateCw,
 } from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
@@ -219,66 +220,75 @@ const ResumePage = () => {
         </SidebarContent>
       </Sidebar>
 
-      <div className="container mx-auto py-8">
+      <div className="resume-analysis-container">
         <Card className="w-full max-w-4xl mx-auto">
-          <CardHeader>
+          <CardHeader className="analysis-header">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl font-bold">Resume Analysis</CardTitle>
-              <Button variant="ghost" onClick={handleBackToHome}>
+              <CardTitle className="analysis-title">Resume Analysis</CardTitle>
+              <Button variant="ghost" onClick={handleBackToHome} className="back-button">
                 <ArrowLeft className="mr-2"/>
                 Back to Home
               </Button>
             </div>
-            <CardDescription>Optimize your resume for ATS and impress recruiters.</CardDescription>
+            <CardDescription className="analysis-subtitle">
+              Upload your resume and provide a job description to get detailed feedback.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <section>
-              <h2 className="text-xl font-semibold mb-2">Upload Your Resume and Enter Job Description</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <motion.div
-                  {...getRootProps()}
-                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
-                  whileHover={{scale: 1.05}}
-                >
-                  <input {...getInputProps()} />
-                  {isDragActive ? (
-                    <p className="text-lg text-muted-foreground">Drop the files here ...</p>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-6 h-6 text-muted-foreground mb-2"/>
-                      <p className="text-lg text-muted-foreground">Drag 'n' drop some files here, or click to select files</p>
-                      <p className="text-sm text-muted-foreground mt-2">Supported formats: PDF, DOCX, TXT</p>
-                    </div>
-                  )}
-                  {uploadProgress > 0 && uploadProgress < 100 && (
-                    <div className="w-full mt-4">
-                      <Progress value={uploadProgress}/>
-                    </div>
-                  )}
-                </motion.div>
+          <CardContent>
+            <div className="upload-container">
+              <motion.div
+                {...getRootProps()}
+                className={`upload-area ${isDragActive ? 'drag-over' : ''}`}
+                whileHover={{scale: 1.05}}
+                transition={{duration: 0.3}}
+              >
+                <input {...getInputProps()} />
+                <Upload className="upload-icon"/>
+                <p>
+                  {isDragActive
+                    ? 'Drop the files here ...'
+                    : 'Drag and drop your resume here, or click to select files'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Supported formats: PDF, DOCX, TXT
+                </p>
+                {uploadProgress > 0 && uploadProgress < 100 && (
+                  <Progress value={uploadProgress} className="mt-4 w-full"/>
+                )}
+              </motion.div>
+
+              <div className="job-description-area">
+                <label htmlFor="jobDescription" className="job-description-label">
+                  Enter Job Description
+                </label>
                 <Textarea
-                  placeholder="Enter job description"
+                  placeholder="Paste the job description here..."
                   value={jobDescription}
                   onChange={e => setJobDescription(e.target.value)}
+                  id="jobDescription"
                 />
               </div>
-              {resumeDataUri && (
-                <p className="text-sm text-muted-foreground mt-2">Resume Uploaded!</p>
-              )}
-            </section>
+            </div>
 
-            <Button onClick={handleAnalyzeResume} disabled={isAnalyzing || !resumeDataUri || !jobDescription} className="mt-4">
-              {isAnalyzing ? (
-                <>
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4"/>
-                  Analyze Resume
-                </>
-              )}
-            </Button>
+            <div className="action-container">
+              <Button
+                className={`analyze-button ${isAnalyzing ? 'loading' : ''}`}
+                onClick={handleAnalyzeResume}
+                disabled={isAnalyzing || !resumeDataUri || !jobDescription}
+              >
+                {isAnalyzing ? (
+                  <>
+                    Analyzing...
+                    <RotateCw className="animate-spin"/>
+                  </>
+                ) : (
+                  <>
+                    Analyze Resume
+                    <CheckCircle className="ml-2"/>
+                  </>
+                )}
+              </Button>
+            </div>
 
             {analysis && (
               <section>
@@ -324,6 +334,37 @@ const ResumePage = () => {
             )}
           </CardContent>
         </Card>
+        <div className="resume-tips">
+  <div className="tips-header">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+    <h3>Resume Pro Tips</h3>
+  </div>
+  
+  <div className="tip-card">
+    <div className="tip-title">📊 Quantify Your Achievements</div>
+    <div className="tip-content">Use numbers to quantify your impact. Instead of "Improved sales", try "Increased sales by 27% in 6 months".</div>
+  </div>
+  
+  <div className="tip-card">
+    <div className="tip-title">🔍 Tailor Your Keywords</div>
+    <div className="tip-content">Mirror the language from the job description to improve ATS compatibility and show your relevance.</div>
+  </div>
+  
+  <div className="tip-card">
+    <div className="tip-title">✂️ Be Concise</div>
+    <div className="tip-content">Keep your resume to 1-2 pages. Recruiters spend an average of just 7.4 seconds scanning a resume.</div>
+  </div>
+  
+  <div className="tip-card">
+    <div className="tip-title">🔤 Use Action Verbs</div>
+    <div className="tip-content">Start bullet points with power verbs like "Achieved," "Implemented," or "Transformed" to create impact.</div>
+  </div>
+</div>
+         
+      </div>
+      <div className="loading-overlay" style={{ display: isAnalyzing ? 'flex' : 'none' }}>
+        <div className="loading-spinner"></div>
+        <div className="loading-text">Analyzing Resume...</div>
       </div>
     </SidebarProvider>
   );
