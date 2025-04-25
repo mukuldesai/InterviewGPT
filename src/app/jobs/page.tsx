@@ -212,158 +212,22 @@ const JobsPage = () => {
 
   const hasActiveFilters = Object.keys(activeFilters).length > 0;
 
-  const generatePageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-      pageNumbers.push(i);
-    }
-
-    if (pageNumbers[0] > 1) {
-      pageNumbers.unshift('...');
-      if (pageNumbers[0] !== 2) {
-        pageNumbers.unshift(1);
-      }
-    }
-
-    if (pageNumbers[pageNumbers.length - 1] < totalPages) {
-      pageNumbers.push('...');
-      if (pageNumbers[pageNumbers.length - 2] !== totalPages - 1) {
-        pageNumbers.push(totalPages);
-      }
-    }
-
-    return pageNumbers;
-  };
-
-  const openJobDetails = (job) => {
-    window.open(job.redirect_url, '_blank'); // Opens job link in a new tab
-  };
-
-  const formatEmploymentType = (type) => {
-    return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  };
-
-  const formatSalary = (salary, period) => {
-    const formattedSalary = salary.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-    return `${formattedSalary} / ${period.replace(/_/g, ' ')}`;
-  };
-
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
-  };
-
-  const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
-  };
-
-  const LocationPinIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-map-pin"
-    >
-      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-      <circle cx="12" cy="10" r="3"/>
-    </svg>
-  );
-
-  const BookmarkIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-bookmark"
-    >
-      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
-    </svg>
-  );
-
-  const BriefcaseIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-briefcase"
-    >
-      <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-    </svg>
-  );
-
-  const SalaryIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-dollar-sign"
-    >
-      <line x1="12" x2="12" y1="2" y2="22"/>
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"/>
-    </svg>
-  );
-
-  const CalendarIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-calendar"
-    >
-      <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-      <line x1="16" x2="16" y1="2" y2="6"/>
-      <line x1="8" x2="8" y1="2" y2="6"/>
-      <line x1="3" x2="21" y1="10" y2="10"/>
-    </svg>
-  );
-
-  const toggleSaveJob = (jobId) => {
-    if (savedJobs.includes(jobId)) {
-      setSavedJobs(savedJobs.filter(id => id !== jobId));
-    } else {
-      setSavedJobs([...savedJobs, jobId]);
-    }
-  };
-
   const getFilterLabel = (key, value) => {
     if (key === 'experience') {
-      return `Experience: ${experienceLevels.find(e => e.value === value).label}`;
+      return `Experience: ${experienceLevels.find(e => e.value === value)?.label || value}`;
     } else if (key === 'jobType') {
-      return `Job Type: ${jobTypes.find(j => j.value === value).label}`;
+      return `Job Type: ${jobTypes.find(j => j.value === value)?.label || value}`;
+    } else if (key === 'salaryRange') {
+      return `Salary: $${value[0]} - $${value[1]}`;
+    } else if (key === 'datePosted') {
+      return `Date Posted: ${datePostedOptions.find(d => d.value === value)?.label || value}`;
     }
-    return '';
-  };
+    return `Unknown Filter: ${value}`;
+  }
+
+  
+
+  
 
   return (
     <SidebarProvider>
@@ -437,7 +301,7 @@ const JobsPage = () => {
                   className="lucide lucide-settings"
                 >
                   <path
-                    d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
+                    d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
                 </svg>
                 Settings
               </SidebarMenuButton>
@@ -530,7 +394,7 @@ const JobsPage = () => {
                 </div>
 
                 <div className="filter-group">
-                  <label>Salary Range</label>
+                  <Label>Salary Range</Label>
                   <Slider
                     min={0}
                     max={200000}
@@ -673,19 +537,6 @@ const JobsPage = () => {
       </div>
     </SidebarProvider>
   );
-
-  function getFilterLabel(key, value) {
-    if (key === 'experience') {
-      return `Experience: ${experienceLevels.find(e => e.value === value)?.label || value}`;
-    } else if (key === 'jobType') {
-      return `Job Type: ${jobTypes.find(j => j.value === value)?.label || value}`;
-    } else if (key === 'salaryRange') {
-      return `Salary: $${value[0]} - $${value[1]}`;
-    } else if (key === 'datePosted') {
-      return `Date Posted: ${datePostedOptions.find(d => d.value === value)?.label || value}`;
-    }
-    return `Unknown Filter: ${value}`;
-  }
 
   function generatePageNumbers() {
     const pageNumbers = [];
@@ -889,11 +740,6 @@ async function getJobListings(searchParams, filters, page = 1, sort = 'relevance
     };
 
     const response = await axios.request(options);
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status: ${response.status}`);
-    }
-
     const data = response.data;
     return data;
 
@@ -904,3 +750,5 @@ async function getJobListings(searchParams, filters, page = 1, sort = 'relevance
 }
 
 export default JobsPage;
+
+
