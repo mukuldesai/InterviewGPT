@@ -6,6 +6,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {JobListing} from '@/services/job-listings';
+import {useToast} from '@/hooks/use-toast';
 
 const adzunaAppId = '4cc9f61bcf7dd24c36d8bc59a8f56805';
 const adzunaAppKey = '67a5043d';
@@ -14,7 +15,9 @@ const JobsPage = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
+  const [salaryRange, setSalaryRange] = useState('');
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
+  const {toast} = useToast();
 
   useEffect(() => {
     const fetchJobListings = async () => {
@@ -23,10 +26,15 @@ const JobsPage = () => {
       }
 
       try {
-        const apiUrl = `https://api.adzuna.com/v1/api/jobs/${location.toLowerCase().replace(
+        let apiUrl = `https://api.adzuna.com/v1/api/jobs/${location.toLowerCase().replace(
           ' ',
           '_'
         )}/search/1?app_id=${adzunaAppId}&app_key=${adzunaAppKey}&what=${jobTitle}&content-type=application/json`;
+
+        // Add salary filter if specified
+        if (salaryRange) {
+          apiUrl += `&salary_min=${salaryRange}`;
+        }
 
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -52,12 +60,17 @@ const JobsPage = () => {
         }
       } catch (error) {
         console.error('Error fetching job listings:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch job listings.',
+          variant: 'destructive',
+        });
         setJobListings([]);
       }
     };
 
     fetchJobListings();
-  }, [jobTitle, location, experienceLevel]);
+  }, [jobTitle, location, experienceLevel, salaryRange]);
 
   return (
     <div className="container mx-auto py-8">
@@ -88,6 +101,15 @@ const JobsPage = () => {
             <SelectItem value="senior level">Senior Level</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <Input
+          type="number"
+          placeholder="Salary Range (Minimum)"
+          value={salaryRange}
+          onChange={e => setSalaryRange(e.target.value)}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
