@@ -18,7 +18,7 @@ import {
   Download,
   MessageSquare,
   ListChecks,
-  User // Import User Icon
+  User
 } from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
@@ -42,7 +42,7 @@ const ResumePage = () => {
   const {toast} = useToast();
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [analysisStep, setAnalysisStep<'upload' | 'analyze' | 'results'>('upload');
+  const [analysisStep, setAnalysisStep] = useState<"upload" | "analyze" | "results">("upload");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
