@@ -1,17 +1,31 @@
+'use client';
+
 import React from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import {useRouter} from 'next/navigation';
+import {ArrowLeft} from "lucide-react";
 
 const SettingsPage = () => {
+  const router = useRouter();
+
+  const handleBackToHome = () => {
+    router.push('/');
+  };
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Settings</h1>
-
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">Settings</CardTitle>
+            <Button variant="ghost" onClick={handleBackToHome}>
+              <ArrowLeft className="mr-2" />
+              Back to Home
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>

@@ -30,6 +30,22 @@ export default function Home() {
     router.push('/resume');
   };
 
+  const handleJobs = () => {
+    router.push('/jobs');
+  };
+
+  const handleProfile = () => {
+    router.push('/profile');
+  };
+
+  const handleSettings = () => {
+    router.push('/settings');
+  };
+
+  const handleProgress = () => {
+    router.push('/progress');
+  };
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -148,9 +164,29 @@ export default function Home() {
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">Welcome to InterviewGPT</h1>
           <p className="text-muted-foreground">Your AI-powered interview coach and resume optimizer</p>
-          <div className="flex justify-start space-x-4">
-            <Button onClick={handleInterviewPractice}>Start Interview Practice</Button>
-            <Button variant="outline" onClick={handleResumeAnalysis}>Analyze Resume</Button>
+          <div className="grid sm:grid-cols-2 md:grid-cols-2 gap-4">
+
+            <Card onClick={handleInterviewPractice} className="cursor-pointer hover:shadow-md">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Interview Practice</CardTitle>
+                <MessageSquare className="w-4 h-4"/>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Get Started</div>
+                <p className="text-xs text-muted-foreground">Practice your interview skills</p>
+              </CardContent>
+            </Card>
+
+            <Card onClick={handleResumeAnalysis} className="cursor-pointer hover:shadow-md">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Resume Analysis</CardTitle>
+                <File className="w-4 h-4"/>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Analyze Now</div>
+                <p className="text-xs text-muted-foreground">Optimize your resume for ATS</p>
+              </CardContent>
+            </Card>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Card>

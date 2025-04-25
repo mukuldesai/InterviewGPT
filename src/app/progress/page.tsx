@@ -3,6 +3,9 @@
 import React from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
+import {Button} from "@/components/ui/button";
+import {useRouter} from 'next/navigation';
+import {ArrowLeft} from "lucide-react";
 
 const ProgressPage = () => {
   // Dummy progress data
@@ -13,13 +16,23 @@ const ProgressPage = () => {
     {name: 'Week 4', score: 4.5},
   ];
 
+  const router = useRouter();
+
+  const handleBackToHome = () => {
+    router.push('/');
+  };
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Progress Tracking</h1>
-
-      <Card>
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>Interview Performance</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">Progress Tracking</CardTitle>
+            <Button variant="ghost" onClick={handleBackToHome}>
+              <ArrowLeft className="mr-2" />
+              Back to Home
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>

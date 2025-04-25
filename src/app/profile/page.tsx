@@ -1,6 +1,11 @@
+'use client';
+
 import React from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
+import {useRouter} from 'next/navigation';
+import {ArrowLeft} from "lucide-react";
 
 const ProfilePage = () => {
   // Dummy user data
@@ -12,25 +17,40 @@ const ProfilePage = () => {
     skills: ['JavaScript', 'React', 'Node.js', 'HTML', 'CSS'],
   };
 
+  const router = useRouter();
+
+  const handleBackToHome = () => {
+    router.push('/');
+  };
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">User Profile</h1>
-
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">User Profile</CardTitle>
+            <Button variant="ghost" onClick={handleBackToHome}>
+              <ArrowLeft className="mr-2" />
+              Back to Home
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
           <div className="flex items-center space-x-4">
             <Avatar className="h-12 w-12">
               <AvatarImage src="https://picsum.photos/id/225/200/200" alt={userData.name}/>
               <AvatarFallback>{userData.name.substring(0, 2)}</AvatarFallback>
             </Avatar>
-            <CardTitle>{userData.name}</CardTitle>
+            <div>
+              <p className="text-lg font-semibold">{userData.name}</p>
+              <p className="text-sm text-muted-foreground">{userData.email}</p>
+            </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <p>Email: {userData.email}</p>
-          <p>Location: {userData.location}</p>
-          <p>Experience: {userData.experience}</p>
-          <p>Skills: {userData.skills.join(', ')}</p>
+          <div className="mt-4">
+            <p>Location: {userData.location}</p>
+            <p>Experience: {userData.experience}</p>
+            <p>Skills: {userData.skills.join(', ')}</p>
+          </div>
         </CardContent>
       </Card>
     </div>

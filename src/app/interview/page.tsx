@@ -10,6 +10,9 @@ import {AnalyzeInterviewResponseInput, analyzeInterviewResponse} from '@/ai/flow
 import {AnalyzeVoiceInputInput, analyzeVoiceInput} from '@/ai/flows/analyze-voice-input';
 import {useToast} from '@/hooks/use-toast';
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {useRouter} from 'next/navigation';
+import {ArrowLeft} from "lucide-react";
+
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');
@@ -24,6 +27,8 @@ const InterviewPage = () => {
   const {toast} = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
+
+  const router = useRouter();
 
 
   useEffect(() => {
@@ -176,122 +181,137 @@ const InterviewPage = () => {
     }
   };
 
+  const handleBackToHome = () => {
+    router.push('/');
+  };
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Interview Practice</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <Select onValueChange={setJobRole}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Job Role"/>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Software Engineer">Software Engineer</SelectItem>
-            <SelectItem value="Data Scientist">Data Scientist</SelectItem>
-            <SelectItem value="Product Manager">Product Manager</SelectItem>
-            <SelectItem value="Project Manager">Project Manager</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select onValueChange={setExperienceLevel}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Experience Level"/>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Entry-level">Entry-level</SelectItem>
-            <SelectItem value="Mid-level">Mid-level</SelectItem>
-            <SelectItem value="Senior-level">Senior-level</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Button onClick={handleGenerateQuestions} className="mb-4">
-        Generate Interview Questions
-      </Button>
-
-      {generatedQuestions.length > 0 && (
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>Question {currentQuestionIndex + 1}/{generatedQuestions.length}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-2">{generatedQuestions[currentQuestionIndex]}</p>
-            <Textarea
-              placeholder="Your answer"
-              value={answer}
-              onChange={e => setAnswer(e.target.value)}
-              className="mb-2"
-            />
-            <div className="flex justify-between">
-              <Button
-                onClick={handlePreviousQuestion}
-                disabled={currentQuestionIndex === 0}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={handleNextQuestion}
-                disabled={currentQuestionIndex === generatedQuestions.length - 1}
-                variant="outline"
-              >
-                Next
-              </Button>
-            </div>
-            <Button onClick={handleAnalyzeAnswer} className="mt-4">
-              Analyze Answer
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {analysis && (
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>Analysis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>Content Clarity: {analysis.contentClarity}</p>
-            <p>Technical Accuracy: {analysis.technicalAccuracy}</p>
-            <p>Confidence: {analysis.confidence}</p>
-            <p>Structure: {analysis.structure}</p>
-            <p>Feedback: {analysis.feedback}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>Voice Analysis</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">Interview Practice</CardTitle>
+            <Button variant="ghost" onClick={handleBackToHome}>
+              <ArrowLeft className="mr-2" />
+              Back to Home
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <Button onClick={startRecording} disabled={isRecording} className="mb-2">
-            {isRecording ? 'Recording...' : 'Record Answer'}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <Select onValueChange={setJobRole}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Job Role"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Software Engineer">Software Engineer</SelectItem>
+                <SelectItem value="Data Scientist">Data Scientist</SelectItem>
+                <SelectItem value="Product Manager">Product Manager</SelectItem>
+                <SelectItem value="Project Manager">Project Manager</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={setExperienceLevel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Experience Level"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Entry-level">Entry-level</SelectItem>
+                <SelectItem value="Mid-level">Mid-level</SelectItem>
+                <SelectItem value="Senior-level">Senior-level</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button onClick={handleGenerateQuestions} className="mb-4">
+            Generate Interview Questions
           </Button>
 
-          <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
-
-          { !(hasCameraPermission) && (
-              <Alert variant="destructive">
-                <AlertTitle>Camera Access Required</AlertTitle>
-                <AlertDescription>
-                  Please allow camera access to use this feature.
-                </AlertDescription>
-              </Alert>
-          )
-          }
-
-          {audioDataUri && (
-            <Button onClick={handleAnalyzeVoice}>Analyze Voice</Button>
+          {generatedQuestions.length > 0 && (
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>Question {currentQuestionIndex + 1}/{generatedQuestions.length}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-2">{generatedQuestions[currentQuestionIndex]}</p>
+                <Textarea
+                  placeholder="Your answer"
+                  value={answer}
+                  onChange={e => setAnswer(e.target.value)}
+                  className="mb-2"
+                />
+                <div className="flex justify-between">
+                  <Button
+                    onClick={handlePreviousQuestion}
+                    disabled={currentQuestionIndex === 0}
+                    variant="outline"
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={handleNextQuestion}
+                    disabled={currentQuestionIndex === generatedQuestions.length - 1}
+                    variant="outline"
+                  >
+                    Next
+                  </Button>
+                </div>
+                <Button onClick={handleAnalyzeAnswer} className="mt-4">
+                  Analyze Answer
+                </Button>
+              </CardContent>
+            </Card>
           )}
-          {voiceAnalysis && (
-            <>
-              <p>Transcription: {voiceAnalysis.transcription}</p>
-              <p>Confidence Level: {voiceAnalysis.confidenceLevel}</p>
-              <p>Filler Word Count: {voiceAnalysis.fillerWordCount}</p>
-              <p>Feedback: {voiceAnalysis.feedback}</p>
-            </>
+
+          {analysis && (
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Content Clarity: {analysis.contentClarity}</p>
+                <p>Technical Accuracy: {analysis.technicalAccuracy}</p>
+                <p>Confidence: {analysis.confidence}</p>
+                <p>Structure: {analysis.structure}</p>
+                <p>Feedback: {analysis.feedback}</p>
+              </CardContent>
+            </Card>
           )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Voice Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={startRecording} disabled={isRecording} className="mb-2">
+                {isRecording ? 'Recording...' : 'Record Answer'}
+              </Button>
+
+              <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
+
+              { !(hasCameraPermission) && (
+                <Alert variant="destructive">
+                  <AlertTitle>Camera Access Required</AlertTitle>
+                  <AlertDescription>
+                    Please allow camera access to use this feature.
+                  </AlertDescription>
+                </Alert>
+              )
+              }
+
+              {audioDataUri && (
+                <Button onClick={handleAnalyzeVoice}>Analyze Voice</Button>
+              )}
+              {voiceAnalysis && (
+                <>
+                  <p>Transcription: {voiceAnalysis.transcription}</p>
+                  <p>Confidence Level: {voiceAnalysis.confidenceLevel}</p>
+                  <p>Filler Word Count: {voiceAnalysis.fillerWordCount}</p>
+                  <p>Feedback: {voiceAnalysis.feedback}</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </div>

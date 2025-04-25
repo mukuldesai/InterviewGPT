@@ -7,6 +7,8 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {JobListing} from '@/services/job-listings';
 import {useToast} from '@/hooks/use-toast';
+import {useRouter} from 'next/navigation';
+import {ArrowLeft} from "lucide-react";
 
 const adzunaAppId = '4cc9f61bcf7dd24c36d8bc59a8f56805';
 const adzunaAppKey = '67a5043d';
@@ -18,6 +20,7 @@ const JobsPage = () => {
   const [salaryRange, setSalaryRange] = useState('');
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
   const {toast} = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchJobListings = async () => {
@@ -72,65 +75,81 @@ const JobsPage = () => {
     fetchJobListings();
   }, [jobTitle, location, experienceLevel, salaryRange]);
 
+  const handleBackToHome = () => {
+    router.push('/');
+  };
+
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Job Listings</h1>
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-bold">Job Listings</CardTitle>
+            <Button variant="ghost" onClick={handleBackToHome}>
+              <ArrowLeft className="mr-2" />
+              Back to Home
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <Input
+              type="text"
+              placeholder="Job Title"
+              value={jobTitle}
+              onChange={e => setJobTitle(e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="Location"
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+            />
+            <Select onValueChange={setExperienceLevel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Experience Level"/>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="entry level">Entry Level</SelectItem>
+                <SelectItem value="associate">Associate</SelectItem>
+                <SelectItem value="mid level">Mid Level</SelectItem>
+                <SelectItem value="senior level">Senior Level</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <Input
-          type="text"
-          placeholder="Job Title"
-          value={jobTitle}
-          onChange={e => setJobTitle(e.target.value)}
-        />
-        <Input
-          type="text"
-          placeholder="Location"
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-        />
-        <Select onValueChange={setExperienceLevel}>
-          <SelectTrigger>
-            <SelectValue placeholder="Experience Level"/>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">Any</SelectItem>
-            <SelectItem value="entry level">Entry Level</SelectItem>
-            <SelectItem value="associate">Associate</SelectItem>
-            <SelectItem value="mid level">Mid Level</SelectItem>
-            <SelectItem value="senior level">Senior Level</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <Input
+              type="number"
+              placeholder="Salary Range (Minimum)"
+              value={salaryRange}
+              onChange={e => setSalaryRange(e.target.value)}
+            />
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <Input
-          type="number"
-          placeholder="Salary Range (Minimum)"
-          value={salaryRange}
-          onChange={e => setSalaryRange(e.target.value)}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {jobListings.map((job, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <CardTitle>{job.title}</CardTitle>
-              <CardDescription>{job.company}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{job.description.substring(0, 100)}...</p>
-              <Button asChild>
-                <a href={job.applyUrl} target="_blank" rel="noopener noreferrer">
-                  Apply Now
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-        {jobListings.length === 0 && <p>No jobs found matching your criteria.</p>}
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {jobListings.map((job, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle>{job.title}</CardTitle>
+                  <CardDescription>{job.company}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">{job.description.substring(0, 100)}...</p>
+                  <Button asChild>
+                    <a href={job.applyUrl} target="_blank" rel="noopener noreferrer">
+                      Apply Now
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+            {jobListings.length === 0 && <p>No jobs found matching your criteria.</p>}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
