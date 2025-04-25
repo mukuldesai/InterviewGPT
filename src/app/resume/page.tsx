@@ -61,6 +61,7 @@ const ResumePage = () => {
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
   const form = useForm<ResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
@@ -73,6 +74,7 @@ const ResumePage = () => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      setUploadedFileName(file.name);
       const reader = new FileReader();
       reader.onloadstart = () => setUploadProgress(10);
       reader.onprogress = (progressEvent) => {
@@ -131,6 +133,7 @@ const ResumePage = () => {
     setResumeDataUri(null);
     setJobDescription('');
     setAnalysis(null);
+    setUploadedFileName(null);
   };
 
   const jobDescriptionExamples = [
@@ -262,6 +265,12 @@ const ResumePage = () => {
                 </p>
                 {uploadProgress > 0 && uploadProgress < 100 && (
                   <Progress value={uploadProgress} className="mt-4 w-full"/>
+                )}
+                {uploadedFileName && (
+                  <div className="mt-2 flex items-center">
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>{uploadedFileName} Uploaded</span>
+                  </div>
                 )}
               </motion.div>
 
