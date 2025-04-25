@@ -14,7 +14,9 @@ import {motion} from 'framer-motion';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Slider} from '@/components/ui/slider';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Settings} from "lucide-react";
+import {CheckCircle2, HelpCircle, Lightbulb, BookOpen, Calendar, Settings} from "lucide-react";
+import {Separator} from "@/components/ui/separator";
+import {Badge} from "@/components/ui/badge";
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');
@@ -142,6 +144,10 @@ const InterviewPage = () => {
     {value: 'Expert', description: 'Very challenging questions.'},
   ];
 
+  const [suggestedSkills, setSuggestedSkills] = useState([
+    "Problem-solving", "Communication", "Teamwork", "Leadership", "Adaptability"
+  ]);
+
   return (
     <div className="container mx-auto py-8">
       <motion.div
@@ -160,8 +166,10 @@ const InterviewPage = () => {
           </div>
         </CardHeader>
         <CardContent>
+
           <section className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Customize Your Practice</h2>
+
             <div className="mb-4">
               <h3 className="text-lg font-semibold mb-2">Job Role</h3>
               <div className="flex flex-wrap gap-2">
@@ -195,10 +203,9 @@ const InterviewPage = () => {
               />
               <p className="text-sm mt-2">
                 Selected Experience Level: {experienceLevels[experienceLevel - 1].label}
+                <Badge variant="secondary" className="ml-2">{experienceLevels[experienceLevel - 1].description}</Badge>
               </p>
-              <p className="text-xs text-muted-foreground">
-                {experienceLevels[experienceLevel - 1].description}
-              </p>
+
             </div>
 
             <div className="mb-4">
@@ -222,6 +229,18 @@ const InterviewPage = () => {
               </p>
             </div>
 
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Suggested Skills</h3>
+              <div className="flex flex-wrap gap-2">
+                {suggestedSkills.map((skill, index) => (
+                  <Badge key={index} variant="outline">{skill}</Badge>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Develop these skills to excel in your interview.
+              </p>
+            </div>
+
             <Button onClick={handleGenerateQuestions} disabled={isLoading} className="mt-4">
               {isLoading ? (
                 <>
@@ -229,10 +248,14 @@ const InterviewPage = () => {
                   Generating Questions...
                 </>
               ) : (
-                'Generate Interview Questions'
+                <>
+                  <Lightbulb className="mr-2 h-4 w-4"/>
+                  Generate Interview Questions
+                </>
               )}
             </Button>
           </section>
+          <Separator className="mb-4"/>
 
           {generatedQuestions.length > 0 && (
             <motion.div
@@ -269,6 +292,7 @@ const InterviewPage = () => {
                   </Button>
                 </div>
                 <Button onClick={handleAnalyzeAnswer} className="mt-4">
+                  <CheckCircle2 className="mr-2 h-4 w-4"/>
                   Analyze Answer
                 </Button>
               </CardContent>
@@ -312,7 +336,7 @@ const InterviewPage = () => {
                     </AccordionContent>
                   </AccordionItem>
                   <AccordionItem value="feedback">
-                    <AccordionTrigger>Feedback</AccordionTrigger>
+                    <AccordionTrigger>Feedback <HelpCircle className="ml-2 h-4 w-4"/></AccordionTrigger>
                     <AccordionContent>
                       {analysis.feedback}
                     </AccordionContent>
@@ -321,6 +345,44 @@ const InterviewPage = () => {
               </CardContent>
             </motion.div>
           )}
+          <section className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">Preparation Resources</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="hover:shadow-md transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><BookOpen className="mr-2 h-4 w-4"/>Recommended Reading</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-4">
+                    <li>"Cracking the Coding Interview"</li>
+                    <li>"Clean Code"</li>
+                    <li>"The Pragmatic Programmer"</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><Calendar className="mr-2 h-4 w-4"/>Interview Scheduling</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Schedule a mock interview to practice with others.</p>
+                  <Button variant="secondary">Schedule Now</Button>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><Settings className="mr-2 h-4 w-4"/>Personalized Settings</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Adjust settings to match your interview style.</p>
+                  <Button variant="secondary">Adjust Settings</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
         </CardContent>
       </motion.div>
     </div>
