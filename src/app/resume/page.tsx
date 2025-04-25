@@ -9,7 +9,17 @@ import {Input} from '@/components/ui/input';
 import {optimizeResume} from '@/ai/flows/optimize-resume';
 import {useToast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
-import {ArrowLeft, File, FileText, Upload, CheckCircle, Download, MessageSquare, ListChecks} from "lucide-react";
+import {
+  ArrowLeft,
+  File,
+  FileText,
+  Upload,
+  CheckCircle,
+  Download,
+  MessageSquare,
+  ListChecks,
+  User // Import User Icon
+} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
 import {motion} from 'framer-motion';
