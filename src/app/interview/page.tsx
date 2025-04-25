@@ -1,8 +1,7 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Button} from '@/components/ui/button';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {generateInterviewQuestions} from '@/ai/flows/generate-interview-questions';
@@ -13,10 +12,13 @@ import {ArrowLeft, RotateCw} from 'lucide-react';
 import {Input} from '@/components/ui/input';
 import {motion} from 'framer-motion';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
+import {Slider} from '@/components/ui/slider';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Settings} from "lucide-react";
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');
-  const [experienceLevel, setExperienceLevel] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState<number>(2); // Use number for slider
   const [generatedQuestions, setGeneratedQuestions] = useState<string[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState('');
@@ -24,12 +26,21 @@ const InterviewPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const {toast} = useToast();
   const router = useRouter();
+  const [difficultyLevel, setDifficultyLevel] = useState('Medium'); // Easy, Medium, Hard, Expert
+
+  const experienceLevels = [
+    {value: 1, label: 'Entry-level', description: 'Basic understanding, limited experience.'},
+    {value: 2, label: 'Junior', description: 'Some experience, capable of handling simple tasks.'},
+    {value: 3, label: 'Mid-level', description: 'Solid experience, can work independently.'},
+    {value: 4, label: 'Senior', description: 'Extensive experience, leads projects, mentors others.'},
+    {value: 5, label: 'Lead', description: 'Expert, guides strategy, manages teams.'},
+  ];
 
   const handleGenerateQuestions = async () => {
-    if (!jobRole || !experienceLevel) {
+    if (!jobRole) {
       toast({
         title: 'Error',
-        description: 'Please enter a job role and select an experience level.',
+        description: 'Please enter a job role.',
         variant: 'destructive',
       });
       return;
@@ -39,7 +50,7 @@ const InterviewPage = () => {
     try {
       const questions = await generateInterviewQuestions({
         jobRole,
-        experienceLevel,
+        experienceLevel: experienceLevels[experienceLevel - 1].label,
         numQuestions: 5,
       });
       setGeneratedQuestions(questions.questions);
@@ -75,10 +86,10 @@ const InterviewPage = () => {
   };
 
   const handleAnalyzeAnswer = async () => {
-    if (!jobRole || !experienceLevel || !generatedQuestions[currentQuestionIndex] || !answer) {
+    if (!jobRole || !generatedQuestions[currentQuestionIndex] || !answer) {
       toast({
         title: 'Error',
-        description: 'Please ensure job role, experience level, question, and answer are provided.',
+        description: 'Please ensure job role, question, and answer are provided.',
         variant: 'destructive',
       });
       return;
@@ -87,7 +98,7 @@ const InterviewPage = () => {
     try {
       const input: AnalyzeInterviewResponseInput = {
         jobRole,
-        experienceLevel,
+        experienceLevel: experienceLevels[experienceLevel - 1].label,
         question: generatedQuestions[currentQuestionIndex],
         answer,
       };
@@ -116,6 +127,21 @@ const InterviewPage = () => {
     animate: {opacity: 1, y: 0, transition: {duration: 0.5}},
   };
 
+  const jobRoles = [
+    {label: 'Software Engineer', icon: '💻'},
+    {label: 'Data Scientist', icon: '📊'},
+    {label: 'Product Manager', icon: '💡'},
+    {label: 'UX Designer', icon: '🎨'},
+    {label: 'Accountant', icon: '💰'},
+  ];
+
+  const difficultyLevels = [
+    {value: 'Easy', description: 'Basic questions.'},
+    {value: 'Medium', description: 'Intermediate questions.'},
+    {value: 'Hard', description: 'Advanced questions.'},
+    {value: 'Expert', description: 'Very challenging questions.'},
+  ];
+
   return (
     <div className="container mx-auto py-8">
       <motion.div
@@ -136,25 +162,66 @@ const InterviewPage = () => {
         <CardContent>
           <section className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Customize Your Practice</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                type="text"
-                placeholder="Enter Job Role"
-                value={jobRole}
-                onChange={e => setJobRole(e.target.value)}
-              />
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Job Role</h3>
+              <div className="flex flex-wrap gap-2">
+                {jobRoles.map(role => (
+                  <Button
+                    key={role.label}
+                    variant={jobRole === role.label ? 'primary' : 'secondary'}
+                    onClick={() => setJobRole(role.label)}
+                  >
+                    {role.icon} {role.label}
+                  </Button>
+                ))}
+                <Input
+                  type="text"
+                  placeholder="Enter Job Role"
+                  value={jobRole}
+                  onChange={e => setJobRole(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+            </div>
 
-              <Select onValueChange={setExperienceLevel}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Experience Level</h3>
+              <Slider
+                defaultValue={[2]}
+                max={5}
+                min={1}
+                step={1}
+                onValueChange={value => setExperienceLevel(value[0])}
+              />
+              <p className="text-sm mt-2">
+                Selected Experience Level: {experienceLevels[experienceLevel - 1].label}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {experienceLevels[experienceLevel - 1].description}
+              </p>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Difficulty Level</h3>
+              <Select onValueChange={setDifficultyLevel}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Experience Level"/>
+                  <SelectValue placeholder="Select Difficulty Level"/>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Entry-level">Entry-level</SelectItem>
-                  <SelectItem value="Mid-level">Mid-level</SelectItem>
-                  <SelectItem value="Senior-level">Senior-level</SelectItem>
+                  {difficultyLevels.map(level => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.value}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground mt-2">
+                {
+                  difficultyLevels.find(level => level.value === difficultyLevel)?.description
+                }
+              </p>
             </div>
+
             <Button onClick={handleGenerateQuestions} disabled={isLoading} className="mt-4">
               {isLoading ? (
                 <>
