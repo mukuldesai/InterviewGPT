@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -8,7 +8,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {JobListing} from '@/services/job-listings';
 import {useToast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
-import {ArrowLeft} from "lucide-react";
+import {ArrowLeft, File as FileIcon, ListChecks, MessageSquare, User} from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
@@ -17,10 +17,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import {File, ListChecks, MessageSquare, User} from "lucide-react";
-
-const adzunaAppId = '4cc9f61bcf7dd24c36d8bc59a8f56805';
-const adzunaAppKey = '67a5043d';
+import {getJobListings} from "@/services/job-listings";
 
 const JobsPage = () => {
   const [jobTitle, setJobTitle] = useState('');
@@ -31,63 +28,43 @@ const JobsPage = () => {
   const {toast} = useToast();
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchJobs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const jobs = await getJobListings(jobTitle, location);
+      setJobListings(jobs);
+    } catch (e: any) {
+      setError(e.message || 'Failed to fetch jobs.');
+      setJobListings([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [jobTitle, location]);
+
   useEffect(() => {
-    const fetchJobListings = async () => {
-      if (!jobTitle || !location) {
-        return;
-      }
+    if (jobTitle || location) {
+      fetchJobs();
+    }
+  }, [fetchJobs, jobTitle, location]);
 
-      try {
-        let apiUrl = `https://api.adzuna.com/v1/api/jobs/${location.toLowerCase().replace(
-          ' ',
-          '_'
-        )}/search/1?app_id=${adzunaAppId}&app_key=${adzunaAppKey}&what=${jobTitle}&content-type=application/json`;
-
-        // Add salary filter if specified
-        if (salaryRange) {
-          apiUrl += `&salary_min=${salaryRange}`;
-        }
-
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (data.results) {
-          const formattedListings: JobListing[] = data.results.map((job: any) => ({
-            title: job.title,
-            company: job.company.display_name,
-            description: job.description,
-            applyUrl: job.redirect_url,
-          }));
-
-          // Filter job listings based on experience level
-          const filteredListings = experienceLevel
-            ? formattedListings.filter(listing =>
-                listing.description.toLowerCase().includes(experienceLevel.toLowerCase())
-              )
-            : formattedListings;
-
-          setJobListings(filteredListings);
-        } else {
-          setJobListings([]);
-        }
-      } catch (error) {
-        console.error('Error fetching job listings:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch job listings.',
-          variant: 'destructive',
-        });
-        setJobListings([]);
-      }
-    };
-
-    fetchJobListings();
-  }, [jobTitle, location, experienceLevel, salaryRange]);
+  const handleSearch = () => {
+    fetchJobs();
+  };
 
   const handleBackToHome = () => {
     router.push('/');
   };
 
+  const experienceLevels = [
+    {value: 'entry level', label: 'Entry Level'},
+    {value: 'associate', label: 'Associate'},
+    {value: 'mid level', label: 'Mid Level'},
+    {value: 'senior level', label: 'Senior Level'},
+  ];
 
   return (
     <SidebarProvider>
@@ -107,7 +84,7 @@ const JobsPage = () => {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton href="/resume">
-                <File className="w-4 h-4"/>
+                <FileIcon className="w-4 h-4"/>
                 Resume
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -115,55 +92,6 @@ const JobsPage = () => {
               <SidebarMenuButton href="/jobs">
                 <ListChecks className="w-4 h-4"/>
                 Jobs
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/progress">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-bar-chart-4"
-                >
-                  <path d="M3 3v18h18"/>
-                  <path d="M7 11V5"/>
-                  <path d="M11 19V8"/>
-                  <path d="M15 15V3"/>
-                  <path d="M19 10v5"/>
-                </svg>
-                Progress
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/profile">
-                <User className="w-4 h-4"/>
-                Profile
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/settings">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-settings"
-                >
-                  <path
-                    d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
-                </svg>
-                Settings
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -201,10 +129,11 @@ const JobsPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Any</SelectItem>
-                  <SelectItem value="entry level">Entry Level</SelectItem>
-                  <SelectItem value="associate">Associate</SelectItem>
-                  <SelectItem value="mid level">Mid Level</SelectItem>
-                  <SelectItem value="senior level">Senior Level</SelectItem>
+                  {experienceLevels.map(level => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -216,7 +145,13 @@ const JobsPage = () => {
                 value={salaryRange}
                 onChange={e => setSalaryRange(e.target.value)}
               />
+              <Button onClick={handleSearch} variant="outline">
+                Search
+              </Button>
             </div>
+
+            {loading && <div>Loading jobs...</div>}
+            {error && <div className="text-red-500">Error: {error}</div>}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {jobListings.map((job, index) => (
@@ -235,7 +170,7 @@ const JobsPage = () => {
                   </CardContent>
                 </Card>
               ))}
-              {jobListings.length === 0 && <p>No jobs found matching your criteria.</p>}
+              {jobListings.length === 0 && !loading && <p>No jobs found matching your criteria.</p>}
             </div>
           </CardContent>
         </Card>
