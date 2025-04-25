@@ -47,16 +47,6 @@ import {cn} from "@/lib/utils";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Label} from "@/components/ui/label";
 
-import {initializeApp} from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  orderBy,
-  limit,
-} from "firebase/firestore";
 import axios from "axios";
 import {
   FIREBASE_API_KEY,
@@ -69,22 +59,25 @@ import {
 
 import './jobs.css';
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+interface Job {
+  job_id: string;
+  employer_name: string;
+  job_title: string;
+  job_city: string;
+  job_state: string;
+  job_is_remote: boolean;
+  job_employment_type: string;
+  job_salary_period: string;
+  job_salary: number;
+  job_posted_at_timestamp: string;
+  job_description: string;
+  job_apply_link: string;
+  job_required_skills: string[];
+  employer_logo: string;
+}
 
 const JobsPage = () => {
-  const [jobListings, setJobListings] = useState<any[]>([]);
+  const [jobListings, setJobListings] = useState<Job[]>([]);
   const {toast} = useToast();
   const router = useRouter();
 
@@ -251,9 +244,9 @@ const JobsPage = () => {
       
         
           
-            
+            <SidebarMenuButton href="/">
               Home
-            
+            </SidebarMenuButton>
           
           
             
@@ -275,24 +268,13 @@ const JobsPage = () => {
           
           
             
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-bar-chart-4"
-              >
+              
                 <path d="M3 3v18h18"/>
                 <path d="M7 11V5"/>
                 <path d="M11 19V8"/>
                 <path d="M15 15V3"/>
                 <path d="M19 10v5"/>
-              </svg>
+              
               Progress
             
           
@@ -304,22 +286,11 @@ const JobsPage = () => {
           
           
             
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-settings"
-              >
+              
                 <path
                   d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
-              </svg>
-              Settings
+                Settings
+              
             
           
         
@@ -329,7 +300,7 @@ const JobsPage = () => {
         <header className="jobs-header">
           <h1 className="text-2xl font-bold">Job Listings</h1>
           <Button variant="ghost" onClick={handleBackToHome} className="back-button">
-            <ArrowLeft className="mr-2"/>
+            
             Back to Home
           </Button>
         </header>
@@ -361,25 +332,26 @@ const JobsPage = () => {
               </div>
 
               <Button className="search-button" onClick={handleSearch} disabled={isLoading}>
+                
                 {isLoading ? 'Searching...' : 'Search Jobs'}
               </Button>
             </div>
 
             {/* Advanced filters */}
             <div className="advanced-filters-toggle" onClick={() => setShowFilters(!showFilters)}>
-              <FilterIcon/>
+              
               <span>Advanced Filters</span>
-              <ChevronDown className={showFilters ? 'rotated' : ''}/>
+              
             </div>
 
             {showFilters && (
-              <div className="advanced-filters-panel">
-                <div className="filter-group">
-                  <label>Experience Level</label>
-                  <div className="checkbox-group">
-                    {experienceLevels.map(level => (
+              
+                
+                  
+                    
                       
                         
+                          
                           type="checkbox"
                           value={level.value}
                           checked={filters.experience.includes(level.value)}
@@ -387,14 +359,13 @@ const JobsPage = () => {
                         />
                         {level.label}
                       
-                    ))}
-                  </div>
-                </div>
+                    
+                  
+                
 
-                <div className="filter-group">
-                  <label>Job Type</label>
-                  <div className="checkbox-group">
-                    {jobTypes.map(type => (
+                
+                  
+                    
                       
                         
                           type="checkbox"
@@ -404,28 +375,27 @@ const JobsPage = () => {
                         />
                         {type.label}
                       
-                    ))}
-                  </div>
-                </div>
+                    
+                  
+                
 
-                <div className="filter-group">
-                  <Label>Salary Range</Label>
-                  <Slider
+                
+                  
+                  
                     min={0}
                     max={200000}
                     step={10000}
                     defaultValue={filters.salaryRange}
                     onValueChange={(values) => setFilters({...filters, salaryRange: values})}
                   />
-                  <div className="salary-range-label">
+                  
                     ${filters.salaryRange[0].toLocaleString()} - ${filters.salaryRange[1].toLocaleString()}
-                  </div>
-                </div>
+                  
+                
 
-                <div className="filter-group">
-                  <label>Date Posted</label>
-                  <div className="radio-group">
-                    {datePostedOptions.map(option => (
+                
+                  
+                    
                       
                         
                           type="radio"
@@ -435,48 +405,60 @@ const JobsPage = () => {
                         />
                         {option.label}
                       
-                    ))}
-                  </div>
-                </div>
+                    
+                  
+                
 
-                <div className="filter-actions">
-                  <Button variant="secondary" onClick={resetFilters}>Reset Filters</Button>
-                  <Button onClick={applyFilters}>Apply Filters</Button>
-                </div>
-              </div>
+                
+                  
+                    Reset Filters
+                  
+                  
+                    Apply Filters
+                  
+                
+              
             )}
 
             {/* Active filters display */}
             {hasActiveFilters && (
-              <div className="active-filters">
-                <span className="active-filters-label">Active Filters:</span>
+              
+                
+                  Active Filters:
+                
                 {Object.entries(activeFilters).map(([key, value]) => (
                   
-                    <span>{getFilterLabel(key, value)}</span>
-                    <button onClick={() => removeFilter(key)} className="remove-filter">
+                    
+                      {getFilterLabel(key, value)}
+                    
+                    
                       ×
-                    </button>
+                    
                   
                 ))}
-                <Button variant="outline" onClick={clearAllFilters}>
+                
                   Clear All
-                </Button>
-              </div>
+                
+              
             )}
           </CardContent>
         </Card>
 
-        <Card className="job-results-container">
-          <CardContent>
-            <div className="results-header">
-              <h3 className="results-count">{totalJobs} jobs found</h3>
-              <div className="sort-options">
-                <label>Sort by:</label>
-                <Select onValueChange={setSortOption} defaultValue={sortOption}>
-                  <SelectTrigger className="sort-select">
+        
+          
+            
+              
+                {totalJobs} jobs found
+              
+              
+                
+                  Sort by:
+                
+                
+                  
                     
-                  </SelectTrigger>
-                  <SelectContent>
+                  
+                  
                     
                       Relevance
                     
@@ -486,48 +468,142 @@ const JobsPage = () => {
                     
                       Salary (high to low)
                     
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                  
+                
+              
+            
 
             {isLoading ? (
-              <div className="loading-jobs">
+              
                 {Array(5).fill(0).map((_, index) => (
-                  <JobCardSkeleton key={index}/>
+                  
                 ))}
-              </div>
+              
             ) : jobListings.length > 0 ? (
-              <div className="job-cards">
+              
                 {jobListings.map(job => (
-                  <JobCard key={job.job_id} job={job} openJobDetails={openJobDetails}
-                           toggleSaveJob={toggleSaveJob} savedJobs={savedJobs}/>
+                  
+                    
+                      
+                        {job.employer_logo ? (
+                          
+                            
+                              src={job.employer_logo}
+                              alt={`${job.employer_name} logo`}
+                              className="company-logo"
+                            />
+                          
+                        ) : (
+                          
+                            
+                              {name={job.employer_name}}/>
+                            
+                          
+                        )}
+                      
+                      
+                        
+                          
+                            {job.job_title}
+                          
+                          
+                            {job.employer_name}
+                          
+                          
+                            
+                            <span>{job.job_city}, {job.job_state}</span>
+                            {job.job_is_remote && <span>Remote</span>}
+                          
+                        
+                        
+                          
+                        
+                      
+                    
+
+                    
+                      
+                        {job.job_employment_type && (
+                          
+                            
+                            {formatEmploymentType(job.job_employment_type)}
+                            
+                          
+                        )}
+
+                        {job.job_salary_period && job.job_salary && (
+                          
+                            
+                            {formatSalary(job.job_salary, job.job_salary_period)}
+                            
+                          
+                        )}
+
+                        
+                          
+                          {formatDate(job.job_posted_at_timestamp)}
+                          
+                        
+                      
+
+                      
+                        {job.job_required_skills && job.job_required_skills.slice(0, 5).map(skill => (
+                          
+                            {skill}
+                          
+                        ))}
+                        {job.job_required_skills && job.job_required_skills.length > 5 && (
+                          
+                            +{job.job_required_skills.length - 5} more
+                          
+                        )}
+                      
+                    
+
+                    
+                      
+                        View Details
+                      
+
+                      
+                        Apply Now
+                      
+                    
+                  
                 ))}
-              </div>
+              
             ) : (
-              <div className="no-results">
-                <SearchIcon className="no-results-icon"/>
-                <h3>No jobs found</h3>
-                <p>Try adjusting your search criteria or explore our recommended jobs below.</p>
-                <Button onClick={clearSearch} variant="outline">
+              
+                
+                  
+                
+                
+                  No jobs found
+                
+                
+                  Try adjusting your search criteria or explore our recommended jobs below.
+                
+                
                   Clear Search
-                </Button>
-              </div>
+                
+              
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination">
+              
                 
-                  <ChevronLeft/>
-                  Previous
-                
-
-                
-                  {generatePageNumbers().map(page => (
+                  
+                    Previous
                     
+                  
+
+                  
+                    {generatePageNumbers().map(page => (
                       
-                        {page}
+                        
+                          {page}
+                        
                       
                     
                   ))}
@@ -535,12 +611,12 @@ const JobsPage = () => {
 
                 
                   Next
-                  <ChevronRight/>
+                  
                 
-              </div>
+              
             )}
-          </CardContent>
-        </Card>
+          
+        
       
     
   );
@@ -552,50 +628,6 @@ const CompanyPlaceholder = ({name}) => (
     {name ? name.charAt(0).toUpperCase() : '?'}
   
 );
-
-/* Circular Progress Indicator */
-const CircularProgress = ({value}) => {
-  const color =
-    value <= 50 ? '#FF4D4F' :
-      value <= 70 ? '#FA8C16' :
-        value <= 85 ? '#FAAD14' :
-          '#52C41A';
-
-  return (
-    
-      
-        
-          cx="60"
-          cy="60"
-          r="54"
-          fill="none"
-          stroke="#f0f2f5"
-          strokeWidth="12"
-        />
-        
-          cx="60"
-          cy="60"
-          r="54"
-          fill="none"
-          stroke={color}
-          strokeWidth="12"
-          strokeDasharray="339.292" // Circumference = 2 * pi * radius
-          strokeDashoffset={`${339.292 * (1 - (value / 100))}`}
-          strokeLinecap="round"
-          transform="rotate(-90 60 60)"
-        />
-        
-          x="60"
-          y="68"
-          textAnchor="middle"
-          fontSize="24"
-          fontWeight="bold"
-          fill={color}
-        >{value}%</text>
-      
-    
-  );
-};
 
 /* Job Card Styling */
 
@@ -627,7 +659,7 @@ const JobCard = ({job, openJobDetails, toggleSaveJob, savedJobs}) => {
             {job.employer_name}
           
           
-            <LocationPinIcon/>
+            
             <span>{job.job_city}, {job.job_state}</span>
             {job.job_is_remote && <span>Remote</span>}
           
@@ -779,4 +811,50 @@ const toggleSaveJob = (jobId) => {
 };
 
 export default JobsPage;
+
+
+function CircularProgress({value}) {
+  const color =
+    value <= 50 ? '#FF4D4F' :
+      value <= 70 ? '#FA8C16' :
+        value <= 85 ? '#FAAD14' :
+          '#52C41A';
+
+  return (
+    
+      
+        
+          cx="60"
+          cy="60"
+          r="54"
+          fill="none"
+          stroke="#f0f2f5"
+          strokeWidth="12"
+        />
+        
+          cx="60"
+          cy="60"
+          r="54"
+          fill="none"
+          stroke={color}
+          strokeWidth="12"
+          strokeDasharray="339.292" // Circumference = 2 * pi * radius
+          strokeDashoffset={`${339.292 * (1 - (value / 100))}`}
+          strokeLinecap="round"
+          transform="rotate(-90 60 60)"
+        />
+        
+          x="60"
+          y="68"
+          textAnchor="middle"
+          fontSize="24"
+          fontWeight="bold"
+          fill={color}
+        >{value}%</text>
+      
+    
+  );
+};
+
+
 
