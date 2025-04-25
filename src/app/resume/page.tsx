@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
@@ -35,6 +35,19 @@ import {
 } from "@/components/ui/sidebar";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+
+const resumeFormSchema = z.object({
+  resumeFile: z.any(),
+  jobDescription: z.string().min(10, {
+    message: "Job description must be at least 10 characters.",
+  }),
+});
+
+type ResumeFormValues = z.infer<typeof resumeFormSchema>;
 
 const ResumePage = () => {
   const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
@@ -44,6 +57,17 @@ const ResumePage = () => {
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [suggestedSkills, setSuggestedSkills] = useState([
+    "Problem-solving", "Communication", "Teamwork", "Leadership", "Adaptability"
+  ]);
+
+  const form = useForm<ResumeFormValues>({
+    resolver: zodResolver(resumeFormSchema),
+    defaultValues: {
+      resumeFile: null,
+      jobDescription: "",
+    },
+  });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -209,47 +233,38 @@ const ResumePage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <section>
-              <h2 className="text-xl font-semibold mb-2">Upload Your Resume</h2>
-              <motion.div
-                {...getRootProps()}
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
-                whileHover={{scale: 1.05}}
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p className="text-lg text-muted-foreground">Drop the files here ...</p>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <Upload className="w-6 h-6 text-muted-foreground mb-2"/>
-                    <p className="text-lg text-muted-foreground">Drag 'n' drop some files here, or click to select files</p>
-                    <p className="text-sm text-muted-foreground mt-2">Supported formats: PDF, DOCX, TXT</p>
-                  </div>
-                )}
-                {uploadProgress > 0 && uploadProgress < 100 && (
-                  <div className="w-full mt-4">
-                    <Progress value={uploadProgress}/>
-                  </div>
-                )}
-              </motion.div>
+              <h2 className="text-xl font-semibold mb-2">Upload Your Resume and Enter Job Description</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.div
+                  {...getRootProps()}
+                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
+                  whileHover={{scale: 1.05}}
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? (
+                    <p className="text-lg text-muted-foreground">Drop the files here ...</p>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <Upload className="w-6 h-6 text-muted-foreground mb-2"/>
+                      <p className="text-lg text-muted-foreground">Drag 'n' drop some files here, or click to select files</p>
+                      <p className="text-sm text-muted-foreground mt-2">Supported formats: PDF, DOCX, TXT</p>
+                    </div>
+                  )}
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="w-full mt-4">
+                      <Progress value={uploadProgress}/>
+                    </div>
+                  )}
+                </motion.div>
+                <Textarea
+                  placeholder="Enter job description"
+                  value={jobDescription}
+                  onChange={e => setJobDescription(e.target.value)}
+                />
+              </div>
               {resumeDataUri && (
                 <p className="text-sm text-muted-foreground mt-2">Resume Uploaded!</p>
               )}
-            </section>
-
-            <section>
-              <h2 className="text-xl font-semibold mb-2">Enter Job Description</h2>
-              <Textarea
-                placeholder="Enter job description"
-                value={jobDescription}
-                onChange={e => setJobDescription(e.target.value)}
-              />
-              <div className="mt-2 space-x-2">
-                {jobDescriptionExamples.map(example => (
-                  <Button variant="outline" size="sm" key={example} onClick={() => setJobDescription(example)}>
-                    {example.substring(0, 30)}...
-                  </Button>
-                ))}
-              </div>
             </section>
 
             <Button onClick={handleAnalyzeResume} disabled={isAnalyzing || !resumeDataUri || !jobDescription} className="mt-4">
