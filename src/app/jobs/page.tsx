@@ -27,8 +27,6 @@ import {Label} from "@/components/ui/label";
 const JobsPage = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
-  const [experienceLevel, setExperienceLevel] = useState('');
-  const [salaryRange, setSalaryRange] = useState<number[]>([0, 100000]);
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
   const {toast} = useToast();
   const router = useRouter();
@@ -40,7 +38,7 @@ const JobsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const jobs = await getJobListings(jobTitle, location, experienceLevel, salaryRange);
+      const jobs = await getJobListings(jobTitle, location);
       setJobListings(jobs);
     } catch (e: any) {
       setError(e.message || 'Failed to fetch jobs.');
@@ -48,7 +46,7 @@ const JobsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [jobTitle, location, experienceLevel, salaryRange]);
+  }, [jobTitle, location]);
 
   useEffect(() => {
     fetchJobs();
@@ -62,24 +60,11 @@ const JobsPage = () => {
     router.push('/');
   };
 
-  const experienceLevels = [
-    {value: 'entry_level', label: 'Entry Level'},
-    {value: 'associate', label: 'Associate'},
-    {value: 'mid_level', label: 'Mid Level'},
-    {value: 'senior_level', label: 'Senior Level'},
-  ];
-
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const toggleAdvancedFilters = () => {
     setShowAdvancedFilters(!showAdvancedFilters);
   };
-
-  const salaryMarks = [
-    {value: 0, label: '$0'},
-    {value: 50000, label: '$50K'},
-    {value: 100000, label: '$100K+'},
-  ];
 
   return (
     <SidebarProvider>
@@ -191,44 +176,6 @@ const JobsPage = () => {
 
             {showAdvancedFilters && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <Select onValueChange={setExperienceLevel}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Experience Level"/>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
-                    {experienceLevels.map(level => (
-                      <SelectItem key={level.value} value={level.value}>
-                        {level.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <div>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Label>Salary Range</Label>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Adjust the slider to filter jobs by salary range.
-                      </TooltipContent>
-                    </Tooltip>
-                    <Slider
-                      defaultValue={[0, 100000]}
-                      max={100000}
-                      step={10000}
-                      aria-label="Salary Range"
-                      value={salaryRange}
-                      onValueChange={(value) => setSalaryRange(value)}
-                    />
-                    <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-                      <span>${salaryRange[0].toLocaleString()}</span>
-                      <span>${salaryRange[1].toLocaleString()}</span>
-                    </div>
-                  </TooltipProvider>
-                </div>
               </div>
             )}
 
@@ -308,8 +255,6 @@ export default JobsPage;
 async function getJobListings(
   jobTitle: string,
   location: string,
-  experienceLevel?: string,
-  salaryRange?: number[]
 ): Promise<JobListing[]> {
   const apiKey = 'a1669c566bmshb8c4ee08d9ea3dfp1c36a3jsn0e4929007baa';
   const apiUrl = 'https://jsearch.p.rapidapi.com/search';
@@ -347,52 +292,12 @@ async function getJobListings(
       company: job.employer_name || 'N/A',
       description: job.job_description || 'N/A',
       applyUrl: job.apply_link || job.job_google_link || 'N/A',
+      location: job.job_country || 'N/A',
     }));
-
-    // Filter by experience level
-    if (experienceLevel) {
-      formattedListings = formattedListings.filter(listing =>
-        listing.description.toLowerCase().includes(experienceLevel.replace('_', ' '))
-      );
-    }
-
-    // Filter by salary range
-    if (salaryRange && salaryRange.length === 2) {
-      const [minSalary, maxSalary] = salaryRange;
-      formattedListings = formattedListings.filter(listing => {
-        const description = listing.description.toLowerCase();
-        const hasSalaryInfo = description.includes('salary') || description.includes('pay');
-
-        if (hasSalaryInfo) {
-          // Basic salary check (improve as needed)
-          const salaryValue = extractSalary(description);
-          if (salaryValue >= minSalary && salaryValue <= maxSalary) {
-            return true;
-          }
-        }
-        return false;
-      });
-    }
 
     return formattedListings;
   } catch (error: any) {
     console.error('Error fetching job listings:', error);
     throw new Error(`Failed to fetch job listings: ${error.message}`);
   }
-}
-
-function extractSalary(description: string): number {
-  const lowerDescription = description.toLowerCase();
-  const salaryRegex = /(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:k|thousand|lakh)?/i;
-  const match = lowerDescription.match(salaryRegex);
-
-  if (match && match[1]) {
-    const salaryStr = match[1].replace(/,/g, '');
-    const salary = parseFloat(salaryStr);
-
-    // Adjust multiplier if needed (e.g., for lakhs, millions, etc.)
-    return salary * 1000;
-  }
-
-  return 0; // Return 0 if no salary is found
 }
