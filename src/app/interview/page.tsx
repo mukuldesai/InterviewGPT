@@ -12,6 +12,7 @@ import {useRouter} from 'next/navigation';
 import {ArrowLeft, RotateCw} from 'lucide-react';
 import {Input} from '@/components/ui/input';
 import {motion} from 'framer-motion';
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');
@@ -117,7 +118,7 @@ const InterviewPage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <motion.Card
+      <motion.div
         className="w-full max-w-4xl mx-auto"
         variants={fadeInVariants}
         initial="initial"
@@ -165,7 +166,7 @@ const InterviewPage = () => {
           </Button>
 
           {generatedQuestions.length > 0 && (
-            <motion.Card
+            <motion.div
               className="mb-4"
               variants={fadeInVariants}
               initial="initial"
@@ -202,11 +203,11 @@ const InterviewPage = () => {
                   Analyze Answer
                 </Button>
               </CardContent>
-            </motion.Card>
+            </motion.div>
           )}
 
           {analysis && (
-            <motion.Card
+            <motion.div
               className="mb-4"
               variants={fadeInVariants}
               initial="initial"
@@ -216,16 +217,43 @@ const InterviewPage = () => {
                 <CardTitle>Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Content Clarity: {analysis.contentClarity}</p>
-                <p>Technical Accuracy: {analysis.technicalAccuracy}</p>
-                <p>Confidence: {analysis.confidence}</p>
-                <p>Structure: {analysis.structure}</p>
-                <p>Feedback: {analysis.feedback}</p>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="contentClarity">
+                    <AccordionTrigger>Content Clarity: {analysis.contentClarity}</AccordionTrigger>
+                    <AccordionContent>
+                      This score reflects how clear and relevant your answer was to the question.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="technicalAccuracy">
+                    <AccordionTrigger>Technical Accuracy: {analysis.technicalAccuracy}</AccordionTrigger>
+                    <AccordionContent>
+                      This score indicates the accuracy of the technical information you provided.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="confidence">
+                    <AccordionTrigger>Confidence: {analysis.confidence}</AccordionTrigger>
+                    <AccordionContent>
+                      This score represents the confidence and tone conveyed in your response.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="structure">
+                    <AccordionTrigger>Structure: {analysis.structure}</AccordionTrigger>
+                    <AccordionContent>
+                      This score assesses how well your answer followed the STAR format (Situation, Task, Action, Result).
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="feedback">
+                    <AccordionTrigger>Feedback</AccordionTrigger>
+                    <AccordionContent>
+                      {analysis.feedback}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
-            </motion.Card>
+            </motion.div>
           )}
         </CardContent>
-      </motion.Card>
+      </motion.div>
     </div>
   );
 };
