@@ -9,8 +9,8 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 10%; /* #121212 in HSL */
-    --foreground: 0 0% 98%; /* White color for text */
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 10%; /* Dark Gray */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
@@ -34,13 +34,13 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 10%; /* #121212 in HSL */
-    --sidebar-foreground: 0 0% 98%; /* White color for text */
+    --sidebar-background: 0 0% 100%; /* White */
+    --sidebar-foreground: 0 0% 10%; /* Dark Gray */
     --sidebar-primary: 240 66% 18%; /* Deep Blue #1A237E */
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 172 100% 42%; /* Teal #00BCD4 */
     --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 20%; /* A slightly lighter shade for borders */
+    --sidebar-border: 0 0% 89.8%; /* Light Gray #E0E0E0 */
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
