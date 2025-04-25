@@ -17,7 +17,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import {getJobListings} from "@/services/job-listings";
 import {Badge} from "@/components/ui/badge";
 import {Slider} from "@/components/ui/slider";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -41,7 +40,7 @@ const JobsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const jobs = await getJobListings(jobTitle, location, experienceLevel, salaryRange.join('-'));
+      const jobs = await getJobListings(jobTitle, location, experienceLevel, salaryRange);
       setJobListings(jobs);
     } catch (e: any) {
       setError(e.message || 'Failed to fetch jobs.');
@@ -64,10 +63,10 @@ const JobsPage = () => {
   };
 
   const experienceLevels = [
-    {value: 'entry level', label: 'Entry Level'},
+    {value: 'entry_level', label: 'Entry Level'},
     {value: 'associate', label: 'Associate'},
-    {value: 'mid level', label: 'Mid Level'},
-    {value: 'senior level', label: 'Senior Level'},
+    {value: 'mid_level', label: 'Mid Level'},
+    {value: 'senior_level', label: 'Senior Level'},
   ];
 
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -197,7 +196,7 @@ const JobsPage = () => {
                     <SelectValue placeholder="Experience Level"/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any</SelectItem>
+                    <SelectItem value="">Any</SelectItem>
                     {experienceLevels.map(level => (
                       <SelectItem key={level.value} value={level.value}>
                         {level.label}
@@ -305,3 +304,95 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
 };
 
 export default JobsPage;
+
+async function getJobListings(
+  jobTitle: string,
+  location: string,
+  experienceLevel?: string,
+  salaryRange?: number[]
+): Promise<JobListing[]> {
+  const apiKey = 'a1669c566bmshb8c4ee08d9ea3dfp1c36a3jsn0e4929007baa';
+  const apiUrl = 'https://jsearch.p.rapidapi.com/search';
+  const host = 'jsearch.p.rapidapi.com';
+
+  try {
+    const params = new URLSearchParams({
+      query: jobTitle,
+      location: location,
+      page: '1',
+      num_pages: '1',
+    });
+
+    const response = await fetch(`${apiUrl}?${params.toString()}`, {
+      headers: {
+        'x-rapidapi-host': host,
+        'x-rapidapi-key': apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const jobResults = data.data;
+
+    if (!jobResults || !Array.isArray(jobResults)) {
+      console.warn('No job results found or invalid API response format.');
+      return [];
+    }
+
+    let formattedListings: JobListing[] = jobResults.map((job: any) => ({
+      title: job.job_title || 'N/A',
+      company: job.employer_name || 'N/A',
+      description: job.job_description || 'N/A',
+      applyUrl: job.apply_link || job.job_google_link || 'N/A',
+    }));
+
+    // Filter by experience level
+    if (experienceLevel) {
+      formattedListings = formattedListings.filter(listing =>
+        listing.description.toLowerCase().includes(experienceLevel.replace('_', ' '))
+      );
+    }
+
+    // Filter by salary range
+    if (salaryRange && salaryRange.length === 2) {
+      const [minSalary, maxSalary] = salaryRange;
+      formattedListings = formattedListings.filter(listing => {
+        const description = listing.description.toLowerCase();
+        const hasSalaryInfo = description.includes('salary') || description.includes('pay');
+
+        if (hasSalaryInfo) {
+          // Basic salary check (improve as needed)
+          const salaryValue = extractSalary(description);
+          if (salaryValue >= minSalary && salaryValue <= maxSalary) {
+            return true;
+          }
+        }
+        return false;
+      });
+    }
+
+    return formattedListings;
+  } catch (error: any) {
+    console.error('Error fetching job listings:', error);
+    throw new Error(`Failed to fetch job listings: ${error.message}`);
+  }
+}
+
+function extractSalary(description: string): number {
+  const lowerDescription = description.toLowerCase();
+  const salaryRegex = /(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:k|thousand|lakh)?/i;
+  const match = lowerDescription.match(salaryRegex);
+
+  if (match && match[1]) {
+    const salaryStr = match[1].replace(/,/g, '');
+    const salary = parseFloat(salaryStr);
+
+    // Adjust multiplier if needed (e.g., for lakhs, millions, etc.)
+    return salary * 1000;
+  }
+
+  return 0; // Return 0 if no salary is found
+}
