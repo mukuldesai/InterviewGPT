@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import {generateInterviewQuestions} from '@/ai/flows/generate-interview-question
 import {AnalyzeInterviewResponseInput, analyzeInterviewResponse} from '@/ai/flows/analyze-interview-response';
 import {AnalyzeVoiceInputInput, analyzeVoiceInput} from '@/ai/flows/analyze-voice-input';
 import {useToast} from '@/hooks/use-toast';
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 const InterviewPage = () => {
   const [jobRole, setJobRole] = useState('');
@@ -21,6 +22,33 @@ const InterviewPage = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
   const {toast} = useToast();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState(false);
+
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings to use this app.',
+        });
+      }
+    };
+
+    getCameraPermission();
+  }, []);
+
 
   const handleGenerateQuestions = async () => {
     if (!jobRole || !experienceLevel) {
@@ -240,6 +268,19 @@ const InterviewPage = () => {
           <Button onClick={startRecording} disabled={isRecording} className="mb-2">
             {isRecording ? 'Recording...' : 'Record Answer'}
           </Button>
+
+          <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
+
+          { !(hasCameraPermission) && (
+              <Alert variant="destructive">
+                <AlertTitle>Camera Access Required</AlertTitle>
+                <AlertDescription>
+                  Please allow camera access to use this feature.
+                </AlertDescription>
+              </Alert>
+          )
+          }
+
           {audioDataUri && (
             <Button onClick={handleAnalyzeVoice}>Analyze Voice</Button>
           )}

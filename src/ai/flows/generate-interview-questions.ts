@@ -1,11 +1,10 @@
-// src/ai/flows/generate-interview-questions.ts
 'use server';
 /**
  * @fileOverview Generates role-specific interview questions based on user-selected job role and experience level.
  *
  * - generateInterviewQuestions - A function that generates interview questions.
  * - GenerateInterviewQuestionsInput - The input type for the generateInterviewQuestions function.
- * - GenerateInterviewQuestionsOutput - The return type for the generateInterviewQuestions function.
+ * - GenerateInterviewQuestionsOutput - The return type for the GenerateInterviewQuestions function.
  */
 
 import {ai} from '@/ai/ai-instance';
@@ -41,11 +40,11 @@ const prompt = ai.definePrompt({
       questions: z.array(z.string()).describe('An array of generated interview questions.'),
     }),
   },
-  prompt: `You are an AI-powered interview question generator.  You will generate {{numQuestions}} interview questions for the job role of {{jobRole}} and the experience level of {{experienceLevel}}. The generated questions should be role-specific and tailored to the experience level. Make sure not to give the same question twice.
+  prompt: `You are an AI-powered interview question generator. You will generate {{numQuestions}} interview questions for the job role of {{jobRole}} and the experience level of {{experienceLevel}}. The generated questions should be role-specific and tailored to the experience level. Make sure not to give the same question twice.
 
 Here are the interview questions:
-{{#each (range numQuestions)}}
-{{@index}}. {{this}}
+{{#each (range 1 numQuestions)}}
+{{@index}}. {{../questions.[@index]}}
 {{/each}}`,
 });
 
@@ -57,11 +56,14 @@ const generateInterviewQuestionsFlow = ai.defineFlow<
   inputSchema: GenerateInterviewQuestionsInputSchema,
   outputSchema: GenerateInterviewQuestionsOutputSchema,
 }, async input => {
+  const numQuestions = input.numQuestions;
   const {output} = await prompt({
     ...input,
-    numQuestions: input.numQuestions
+    numQuestions: numQuestions,
+    questions: Array.from({ length: numQuestions }, (_, i) => `Question ${i + 1}`),
   });
+
   return {
-    questions: Array.from({ length: input.numQuestions }, (_, i) => output!.questions[i] || `Question ${i + 1}`),
+    questions: Array.from({ length: numQuestions }, (_, i) => output!.questions[i] || `Question ${i + 1}`),
   };
 });
