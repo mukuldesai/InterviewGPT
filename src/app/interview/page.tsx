@@ -14,7 +14,7 @@ import {motion} from 'framer-motion';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Slider} from '@/components/ui/slider';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {CheckCircle2, HelpCircle, Lightbulb, BookOpen, Calendar, Settings} from "lucide-react";
+import {CheckCircle2, HelpCircle, Lightbulb} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {Badge} from "@/components/ui/badge";
 
@@ -345,43 +345,6 @@ const InterviewPage = () => {
               </CardContent>
             </motion.div>
           )}
-          <section className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Preparation Resources</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="hover:shadow-md transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center"><BookOpen className="mr-2 h-4 w-4"/>Recommended Reading</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="list-disc pl-4">
-                    <li>"Cracking the Coding Interview"</li>
-                    <li>"Clean Code"</li>
-                    <li>"The Pragmatic Programmer"</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center"><Calendar className="mr-2 h-4 w-4"/>Interview Scheduling</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Schedule a mock interview to practice with others.</p>
-                  <Button variant="secondary">Schedule Now</Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center"><Settings className="mr-2 h-4 w-4"/>Personalized Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Adjust settings to match your interview style.</p>
-                  <Button variant="secondary">Adjust Settings</Button>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
 
         </CardContent>
       </motion.div>
@@ -390,3 +353,4 @@ const InterviewPage = () => {
 };
 
 export default InterviewPage;
+
