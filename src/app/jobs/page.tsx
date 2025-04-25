@@ -24,10 +24,29 @@ import {cn} from "@/lib/utils";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Label} from "@/components/ui/label";
 
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+import axios from "axios";
+import {FIREBASE_API_KEY, FIREBASE_APP_ID, FIREBASE_AUTH_DOMAIN, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET} from "@/app/config";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const JobsPage = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState('');
-  const [jobListings, setJobListings] = useState<JobListing[]>([]);
+  const [jobListings, setJobListings] = useState<any[]>([]);
   const {toast} = useToast();
   const router = useRouter();
 
@@ -38,7 +57,7 @@ const JobsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const jobs = await getJobListings(jobTitle, location);
+      const jobs = await searchJobsFromFirebase({keywords: jobTitle, location: location});
       setJobListings(jobs);
     } catch (e: any) {
       setError(e.message || 'Failed to fetch jobs.');
@@ -49,8 +68,30 @@ const JobsPage = () => {
   }, [jobTitle, location]);
 
   useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
+    const refreshJobsIfNeeded = async () => {
+      try {
+        // Check when jobs were last updated
+        const lastUpdate = localStorage.getItem('lastJobsUpdate');
+        const now = new Date();
+
+        // If never updated or updated more than 24 hours ago
+        if (!lastUpdate || (now - new Date(lastUpdate)) > 24 * 60 * 60 * 1000) {
+          // Fetch fresh jobs from API
+          const newJobs = await fetchJobsFromAPI();
+
+          // Store in Firebase
+          await storeJobsInFirebase(newJobs);
+
+          // Update last refresh time
+          localStorage.setItem('lastJobsUpdate', now.toISOString());
+        }
+      } catch (error) {
+        console.error("Error refreshing jobs:", error);
+      }
+    };
+
+    refreshJobsIfNeeded();
+  }, []);
 
   const handleSearch = () => {
     fetchJobs();
@@ -208,7 +249,7 @@ const JobsPage = () => {
 };
 
 interface JobCardProps {
-  job: JobListing;
+  job: any;
 }
 
 const JobCard: React.FC<JobCardProps> = ({job}) => {
@@ -219,7 +260,7 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={() => applyToJob(job.apply_url)}>
                 <Link className="h-4 w-4"/>
               </Button>
             </TooltipTrigger>
@@ -233,7 +274,7 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
       <CardContent className="p-4">
         <div className="flex items-center space-x-2 text-sm text-gray-500">
           <Briefcase className="h-4 w-4"/>
-          <span>{job.company}</span>
+          <span>{job.company_name}</span>
         </div>
         <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
           <MapPin className="h-4 w-4"/>
@@ -241,63 +282,136 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
         </div>
         <CardDescription className="text-sm text-gray-700 mt-2 line-clamp-3">{job.description}</CardDescription>
         <Button asChild variant="link" className="mt-4">
-          <a href={job.applyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
-            Learn More <ArrowLeft className="ml-2 h-4 w-4 rotate-180"/>
-          </a>
+          {/*{job.applyUrl}*/}
+          {/*<a href={job.applyUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">*/}
+          {/*  Learn More <ArrowLeft className="ml-2 h-4 w-4 rotate-180"/>*/}
+          {/*</a>*/}
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default JobsPage;
-
-async function getJobListings(
-  jobTitle: string,
-  location: string,
-): Promise<JobListing[]> {
-  const apiKey = 'a1669c566bmshb8c4ee08d9ea3dfp1c36a3jsn0e4929007baa';
-  const apiUrl = 'https://jsearch.p.rapidapi.com/search';
-  const host = 'jsearch.p.rapidapi.com';
-
+async function fetchJobsFromAPI(params = {}) {
   try {
-    const params = new URLSearchParams({
-      query: jobTitle,
-      location: location,
-      page: '1',
-      num_pages: '1',
-    });
-
-    const response = await fetch(`${apiUrl}?${params.toString()}`, {
-      headers: {
-        'x-rapidapi-host': host,
-        'x-rapidapi-key': apiKey,
+    // Set up the API request with your parameters
+    const options = {
+      method: 'GET',
+      url: 'https://active-jobs-db.p.rapidapi.com/active-ats-6m',
+      params: {
+        description_type: 'text',
+        // Add any additional parameters based on user search
+        ...params
       },
-    });
+      headers: {
+        'x-rapidapi-host': 'active-jobs-db.p.rapidapi.com',
+        'x-rapidapi-key': 'a1669c566bmshb8c4ee08d9ea3dfp1c36a3jsn0e4929007baa'
+      }
+    };
 
-    if (!response.ok) {
-      throw new Error(`API request failed with status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const jobResults = data.data;
-
-    if (!jobResults || !Array.isArray(jobResults)) {
-      console.warn('No job results found or invalid API response format.');
-      return [];
-    }
-
-    let formattedListings: JobListing[] = jobResults.map((job: any) => ({
-      title: job.job_title || 'N/A',
-      company: job.employer_name || 'N/A',
-      description: job.job_description || 'N/A',
-      applyUrl: job.apply_link || job.job_google_link || 'N/A',
-      location: job.job_country || 'N/A',
-    }));
-
-    return formattedListings;
-  } catch (error: any) {
-    console.error('Error fetching job listings:', error);
-    throw new Error(`Failed to fetch job listings: ${error.message}`);
+    const response = await axios.request(options);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching jobs from API:", error);
+    throw error;
   }
 }
+
+// 4. Function to store jobs in Firebase
+async function storeJobsInFirebase(jobs) {
+  try {
+    const jobsCollection = collection(db, "jobs");
+    const batch = [];
+
+    for (const job of jobs) {
+      // Check if job already exists to avoid duplicates
+      const q = query(jobsCollection, where("job_id", "==", job.job_id));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        // Format the job data for storage
+        const jobData = {
+          job_id: job.job_id,
+          title: job.title,
+          company_name: job.company_name,
+          location: job.location,
+          description: job.description,
+          apply_url: job.apply_url, // This is the critical field for redirecting to apply
+          posted_date: new Date(job.posted_at),
+          salary: job.salary || "Not specified",
+          job_type: job.job_type || "Not specified",
+          keywords: extractKeywords(job.title, job.description),
+          last_updated: new Date()
+        };
+
+        batch.push(addDoc(jobsCollection, jobData));
+      }
+    }
+
+    // Execute all document additions
+    await Promise.all(batch);
+    console.log(`${batch.length} new jobs added to database`);
+
+    return true;
+  } catch (error) {
+    console.error("Error storing jobs in Firebase:", error);
+    throw error;
+  }
+}
+
+// 5. Function to extract keywords for better searching
+function extractKeywords(title, description) {
+  // Simple implementation - split on spaces and filter
+  // In a production app, you might want a more sophisticated NLP approach
+  const combined = `${title} ${description}`.toLowerCase();
+
+  // Remove common words and punctuation
+  const words = combined.split(/\W+/).filter(word =>
+    word.length > 2 &&
+    !['and', 'the', 'for', 'with', 'this', 'that'].includes(word)
+  );
+
+  // Return unique words
+  return [...new Set(words)];
+}
+
+// 6. Function to search jobs from Firebase
+async function searchJobsFromFirebase(searchParams) {
+  try {
+    const jobsCollection = collection(db, "jobs");
+    let q = query(jobsCollection, orderBy("posted_date", "desc"), limit(50));
+
+    // Add filters based on search parameters
+    if (searchParams.keywords) {
+      // Note: This is a simple implementation
+      // Firestore doesn't support full-text search natively
+      // For production, consider using Algolia or similar
+      q = query(q, where("keywords", "array-contains-any", searchParams.keywords.split(" ")));
+    }
+
+    if (searchParams.location) {
+      q = query(q, where("location", "==", searchParams.location));
+    }
+
+    // Add other filters as needed
+
+    const querySnapshot = await getDocs(q);
+    const jobs = [];
+
+    querySnapshot.forEach((doc) => {
+      jobs.push({ id: doc.id, ...doc.data() });
+    });
+
+    return jobs;
+  } catch (error) {
+    console.error("Error searching jobs from Firebase:", error);
+    throw error;
+  }
+}
+
+// 7. Function to redirect to application page
+function applyToJob(applyUrl) {
+  // Open in new tab
+  window.open(applyUrl, '_blank');
+}
+export default JobsPage;
