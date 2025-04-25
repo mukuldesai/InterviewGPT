@@ -42,6 +42,7 @@ import * as z from "zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {jsPDF} from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import {cn} from "@/lib/utils";
 
 const resumeFormSchema = z.object({
   resumeFile: z.any(),
@@ -245,7 +246,7 @@ const ResumePage = () => {
             <div className="upload-container">
               <motion.div
                 {...getRootProps()}
-                className={`upload-area ${isDragActive ? 'drag-over' : ''}`}
+                className={cn("upload-area", isDragActive ? 'drag-over' : '')}
                 whileHover={{scale: 1.05}}
                 transition={{duration: 0.3}}
               >
@@ -279,7 +280,7 @@ const ResumePage = () => {
 
             <div className="action-container">
               <Button
-                className={`analyze-button ${isAnalyzing ? 'loading' : ''}`}
+                className={cn("analyze-button", isAnalyzing ? 'loading' : '')}
                 onClick={handleAnalyzeResume}
                 disabled={isAnalyzing || !resumeDataUri || !jobDescription}
               >
@@ -373,7 +374,7 @@ const ResumePage = () => {
   
   <div className="tip-card">
     <div className="tip-title">✂️ Be Concise</div>
-    <div class="tip-content">Keep your resume to 1-2 pages. Recruiters spend an average of just 7.4 seconds scanning a resume.</div>
+    <div className="tip-content">Keep your resume to 1-2 pages. Recruiters spend an average of just 7.4 seconds scanning a resume.</div>
   </div>
   
   <div className="tip-card">
