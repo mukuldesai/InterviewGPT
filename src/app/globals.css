@@ -68,14 +68,14 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 0 0% 3.9%; /* #121212 in HSL */
-    --sidebar-foreground: 0 0% 98%; /* White color for text */
-    --sidebar-primary: 240 66% 18%; /* Deep Blue #1A237E */
+    --sidebar-background: 220 18% 96%; /* Light Gray */
+    --sidebar-foreground: 220 20% 20%; /* Dark Gray */
+    --sidebar-primary: 230 50% 45%; /* Medium Blue */
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 172 100% 42%; /* Teal #00BCD4 */
     --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 20%; /* A slightly lighter shade for borders */
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 230 65% 55%;
   }
 }
 

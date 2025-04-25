@@ -43,7 +43,6 @@ const ResumePage = () => {
   const {toast} = useToast();
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [analysisStep, setAnalysisStep] = useState<"upload" | "analyze" | "results">("upload");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -60,7 +59,6 @@ const ResumePage = () => {
       reader.onloadend = () => {
         setResumeDataUri(reader.result as string);
         setUploadProgress(100);
-        setAnalysisStep('analyze'); // Move to the next step after upload
       };
       reader.readAsDataURL(file);
     }
@@ -88,7 +86,6 @@ const ResumePage = () => {
         title: 'Analysis Complete',
         description: 'Your resume has been analyzed.',
       });
-      setAnalysisStep('results'); // Move to the results step
     } catch (error: any) {
       console.error('Error analyzing resume:', error);
       toast({
@@ -109,20 +106,6 @@ const ResumePage = () => {
     setResumeDataUri(null);
     setJobDescription('');
     setAnalysis(null);
-    setAnalysisStep('upload');
-  };
-
-  const getAnalysisStepLabel = () => {
-    switch (analysisStep) {
-      case 'upload':
-        return '1. Upload Resume';
-      case 'analyze':
-        return '2. Analyze Resume';
-      case 'results':
-        return '3. View Results';
-      default:
-        return '';
-    }
   };
 
   const jobDescriptionExamples = [
@@ -130,89 +113,6 @@ const ResumePage = () => {
     "Data Scientist proficient in Python, machine learning, and data visualization.",
     "Marketing Manager with a proven track record in digital marketing and SEO."
   ];
-
-  const renderUploadArea = () => (
-    <motion.div
-      {...getRootProps()}
-      className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
-      whileHover={{scale: 1.05}}
-    >
-      <input {...getInputProps()} />
-      {isDragActive ? (
-        <p className="text-lg text-muted-foreground">Drop the files here ...</p>
-      ) : (
-        <div className="flex flex-col items-center">
-          <Upload className="w-6 h-6 text-muted-foreground mb-2"/>
-          <p className="text-lg text-muted-foreground">Drag 'n' drop some files here, or click to select files</p>
-          <p className="text-sm text-muted-foreground mt-2">Supported formats: PDF, DOCX, TXT</p>
-        </div>
-      )}
-      {uploadProgress > 0 && uploadProgress < 100 && (
-        <div className="w-full mt-4">
-          <Progress value={uploadProgress}/>
-        </div>
-      )}
-    </motion.div>
-  );
-
-  const renderJobDescriptionArea = () => (
-    <motion.div className="mt-4" initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
-      <Textarea
-        placeholder="Enter job description"
-        value={jobDescription}
-        onChange={e => setJobDescription(e.target.value)}
-      />
-      <div className="mt-2 space-x-2">
-        {jobDescriptionExamples.map(example => (
-          <Button variant="outline" size="sm" key={example} onClick={() => setJobDescription(example)}>
-            {example.substring(0, 30)}...
-          </Button>
-        ))}
-      </div>
-    </motion.div>
-  );
-
-  const renderResults = () => (
-    <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Analysis Results</CardTitle>
-          <CardDescription>Review the analysis and suggestions to improve your resume.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {analysis ? (
-            <>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="atsCompatibility">
-                  <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
-                  <AccordionContent>
-                    This score reflects how well your resume is likely to be parsed by Applicant Tracking Systems.
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="suggestions">
-                  <AccordionTrigger>Suggestions</AccordionTrigger>
-                  <AccordionContent>
-                    {analysis.suggestions.map((suggestion, index) => (
-                      <li key={index} className="list-disc ml-4">{suggestion}</li>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="tailoredSummary">
-                  <AccordionTrigger>Tailored Summary</AccordionTrigger>
-                  <AccordionContent>
-                    {analysis.tailoredSummary}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
-            </>
-          ) : (
-            <p>No analysis available.</p>
-          )}
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
 
   return (
     <SidebarProvider>
@@ -305,28 +205,108 @@ const ResumePage = () => {
                 Back to Home
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">{getAnalysisStepLabel()}</p>
+            <CardDescription>Optimize your resume for ATS and impress recruiters.</CardDescription>
           </CardHeader>
-          <CardContent>
-            {analysisStep === 'upload' && renderUploadArea()}
-            {analysisStep === 'analyze' && (
-              <>
-                {renderJobDescriptionArea()}
-                <Button onClick={handleAnalyzeResume} disabled={isAnalyzing} className="mt-4">
-                  {isAnalyzing ? (
-                    <>
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="mr-2 h-4 w-4"/>
-                      Analyze Resume
-                    </>
-                  )}
-                </Button>
-              </>
+          <CardContent className="space-y-4">
+            <section>
+              <h2 className="text-xl font-semibold mb-2">Upload Your Resume</h2>
+              <motion.div
+                {...getRootProps()}
+                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-md cursor-pointer bg-muted hover:bg-accent transition-colors duration-300"
+                whileHover={{scale: 1.05}}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p className="text-lg text-muted-foreground">Drop the files here ...</p>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <Upload className="w-6 h-6 text-muted-foreground mb-2"/>
+                    <p className="text-lg text-muted-foreground">Drag 'n' drop some files here, or click to select files</p>
+                    <p className="text-sm text-muted-foreground mt-2">Supported formats: PDF, DOCX, TXT</p>
+                  </div>
+                )}
+                {uploadProgress > 0 && uploadProgress < 100 && (
+                  <div className="w-full mt-4">
+                    <Progress value={uploadProgress}/>
+                  </div>
+                )}
+              </motion.div>
+              {resumeDataUri && (
+                <p className="text-sm text-muted-foreground mt-2">Resume Uploaded!</p>
+              )}
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold mb-2">Enter Job Description</h2>
+              <Textarea
+                placeholder="Enter job description"
+                value={jobDescription}
+                onChange={e => setJobDescription(e.target.value)}
+              />
+              <div className="mt-2 space-x-2">
+                {jobDescriptionExamples.map(example => (
+                  <Button variant="outline" size="sm" key={example} onClick={() => setJobDescription(example)}>
+                    {example.substring(0, 30)}...
+                  </Button>
+                ))}
+              </div>
+            </section>
+
+            <Button onClick={handleAnalyzeResume} disabled={isAnalyzing || !resumeDataUri || !jobDescription} className="mt-4">
+              {isAnalyzing ? (
+                <>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4"/>
+                  Analyze Resume
+                </>
+              )}
+            </Button>
+
+            {analysis && (
+              <section>
+                <h2 className="text-xl font-semibold mb-2">Analysis Results</h2>
+                <Card className="mt-4">
+                  <CardHeader>
+                    <CardTitle>Analysis Results</CardTitle>
+                    <CardDescription>Review the analysis and suggestions to improve your resume.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {analysis ? (
+                      <>
+                        <Accordion type="single" collapsible>
+                          <AccordionItem value="atsCompatibility">
+                            <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
+                            <AccordionContent>
+                              This score reflects how well your resume is likely to be parsed by Applicant Tracking Systems.
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="suggestions">
+                            <AccordionTrigger>Suggestions</AccordionTrigger>
+                            <AccordionContent>
+                              {analysis.suggestions.map((suggestion, index) => (
+                                <li key={index} className="list-disc ml-4">{suggestion}</li>
+                              ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="tailoredSummary">
+                            <AccordionTrigger>Tailored Summary</AccordionTrigger>
+                            <AccordionContent>
+                              {analysis.tailoredSummary}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                        <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
+                      </>
+                    ) : (
+                      <p>No analysis available.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </section>
             )}
-            {analysisStep === 'results' && analysis && renderResults()}
           </CardContent>
         </Card>
       </div>
