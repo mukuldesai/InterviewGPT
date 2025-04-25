@@ -4,7 +4,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {JobListing} from '@/services/job-listings';
 import {useToast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
@@ -23,6 +23,7 @@ import {Slider} from "@/components/ui/slider";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {cn} from "@/lib/utils";
 import {Skeleton} from "@/components/ui/skeleton";
+import {Label} from "@/components/ui/label";
 
 const JobsPage = () => {
   const [jobTitle, setJobTitle] = useState('');
@@ -304,3 +305,4 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
 };
 
 export default JobsPage;
+
