@@ -33,6 +33,7 @@ const prompt = ai.definePrompt({
       jobRole: z.string().describe('The job role for which to generate interview questions.'),
       experienceLevel: z.string().describe('The experience level of the candidate (e.g., Entry-level, Mid-level, Senior-level).'),
       numQuestions: z.number().default(5).describe('The number of interview questions to generate.'),
+      questions: z.array(z.string()).describe('An array of interview questions.'),
     }),
   },
   output: {
@@ -43,8 +44,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI-powered interview question generator. You will generate {{numQuestions}} interview questions for the job role of {{jobRole}} and the experience level of {{experienceLevel}}. The generated questions should be role-specific and tailored to the experience level. Make sure not to give the same question twice.
 
 Here are the interview questions:
-{{#each (range 1 numQuestions)}}
-{{@index}}. {{../questions.[@index]}}
+{{#each questions}}
+{{@index}}. {{this}}
 {{/each}}`,
 });
 
@@ -57,13 +58,15 @@ const generateInterviewQuestionsFlow = ai.defineFlow<
   outputSchema: GenerateInterviewQuestionsOutputSchema,
 }, async input => {
   const numQuestions = input.numQuestions;
+  const questions = Array.from({ length: numQuestions }, (_, i) => `Question ${i + 1}`);
+
   const {output} = await prompt({
     ...input,
     numQuestions: numQuestions,
-    questions: Array.from({ length: numQuestions }, (_, i) => `Question ${i + 1}`),
+    questions: questions,
   });
 
   return {
-    questions: Array.from({ length: numQuestions }, (_, i) => output!.questions[i] || `Question ${i + 1}`),
+    questions: output!.questions,
   };
 });
