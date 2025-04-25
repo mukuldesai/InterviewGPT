@@ -60,9 +60,6 @@ const ResumePage = () => {
   const router = useRouter();
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [suggestedSkills, setSuggestedSkills] = useState([
-    "Problem-solving", "Communication", "Teamwork", "Leadership", "Adaptability"
-  ]);
 
   const form = useForm<ResumeFormValues>({
     resolver: zodResolver(resumeFormSchema),
@@ -140,6 +137,14 @@ const ResumePage = () => {
     "Data Scientist proficient in Python, machine learning, and data visualization.",
     "Marketing Manager with a proven track record in digital marketing and SEO."
   ];
+
+    const getScoreColor = (score: number) => {
+    if (score <= 50) return '#FF4D4F';
+    if (score <= 70) return '#FA8C16';
+    if (score <= 85) return '#FAAD14';
+    return '#52C41A';
+  };
+
 
   return (
     <SidebarProvider>
@@ -303,6 +308,20 @@ const ResumePage = () => {
                   <CardContent>
                     {analysis ? (
                       <>
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="w-full md:w-1/2">
+                                <div className="ats-score-circle" style={{'--score-value': analysis.atsCompatibilityScore, '--score-color': getScoreColor(analysis.atsCompatibilityScore)}}>
+                                    <div className="score-value">{analysis.atsCompatibilityScore}%</div>
+                                </div>
+                            </div>
+                            <div className="w-full md:w-1/2">
+                                <div>
+                                    <h3>Section Scores</h3>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
                         <Accordion type="single" collapsible>
                           <AccordionItem value="atsCompatibility">
                             <AccordionTrigger>ATS Compatibility Score: {analysis.atsCompatibilityScore}</AccordionTrigger>
@@ -338,7 +357,7 @@ const ResumePage = () => {
         </Card>
         <div className="resume-tips">
   <div className="tips-header">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
     <h3>Resume Pro Tips</h3>
   </div>
   
@@ -354,7 +373,7 @@ const ResumePage = () => {
   
   <div className="tip-card">
     <div className="tip-title">✂️ Be Concise</div>
-    <div className="tip-content">Keep your resume to 1-2 pages. Recruiters spend an average of just 7.4 seconds scanning a resume.</div>
+    <div class="tip-content">Keep your resume to 1-2 pages. Recruiters spend an average of just 7.4 seconds scanning a resume.</div>
   </div>
   
   <div className="tip-card">

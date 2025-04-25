@@ -340,3 +340,160 @@ body {
   font-weight: 600;
   color: #00CBA9;
 }
+.ats-score-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--score-color) calc(var(--score-value) * 1%),
+    #f0f2f5 0
+  );
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  transition: all 0.5s ease;
+}
+
+.ats-score-circle::before {
+  content: '';
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: white;
+}
+
+.score-value {
+  position: relative;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--score-color);
+  z-index: 1;
+}
+
+.score-label {
+  position: absolute;
+  bottom: -30px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #4a5568;
+  width: 100%;
+  text-align: center;
+}
+
+@keyframes scoreAppear {
+  from { --score-value: 0; }
+  to { --score-value: var(--actual-score); }
+}
+
+.keyword-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.keyword-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.keyword-pill.matched {
+  background-color: rgba(82, 196, 26, 0.1);
+  color: #52C41A;
+  border: 1px solid rgba(82, 196, 26, 0.3);
+}
+
+.keyword-pill.missing {
+  background-color: rgba(255, 77, 79, 0.1);
+  color: #FF4D4F;
+  border: 1px solid rgba(255, 77, 79, 0.3);
+  cursor: pointer;
+}
+
+.keyword-pill.missing:hover {
+  background-color: rgba(255, 77, 79, 0.2);
+  transform: translateY(-2px);
+}
+
+.keyword-pill .icon {
+  font-size: 12px;
+}
+
+.keyword-importance {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.importance-high {
+  background-color: #FF4D4F;
+}
+
+.importance-medium {
+  background-color: #FAAD14;
+}
+
+.importance-low {
+  background-color: #1890FF;
+}
+
+.section-score-container {
+  margin-bottom: 20px;
+}
+
+.section-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.section-title .icon {
+  color: #4299e1;
+}
+
+.section-score-value {
+  font-weight: 600;
+  color: var(--score-color);
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #edf2f7;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--start-color) 0%, var(--end-color) 100%);
+  width: var(--progress-width);
+  transition: width 1s ease;
+}
+
+@keyframes progressFill {
+  from { width: 0; }
+  to { width: var(--progress-width); }
+}
