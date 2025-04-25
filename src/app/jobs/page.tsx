@@ -13,9 +13,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {useToast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
@@ -28,14 +25,12 @@ import {
   MapPin as LocationPinIcon,
   Briefcase as BriefcaseIcon,
   Calendar as CalendarIcon,
-  Link as LinkIcon,
   Search as SearchIcon,
   Filter as FilterIcon,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Bookmark as BookmarkIcon,
-  Salary as SalaryIcon,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -56,7 +51,6 @@ import {initializeApp} from "firebase/app";
 import {
   getFirestore,
   collection,
-  addDoc,
   query,
   where,
   getDocs,
@@ -228,94 +222,112 @@ const JobsPage = () => {
     return `Unknown Filter: ${value}`;
   }
 
-  
+  const generatePageNumbers = useCallback(() => {
+    const pageNumbers = [];
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+      pageNumbers.push(i);
+    }
 
-  
+    if (pageNumbers[0] > 1) {
+      pageNumbers.unshift('...');
+      if (pageNumbers[0] !== 2) {
+        pageNumbers.unshift(1);
+      }
+    }
+
+    if (pageNumbers[pageNumbers.length - 1] < totalPages) {
+      pageNumbers.push('...');
+      if (pageNumbers[pageNumbers.length - 2] !== totalPages - 1) {
+        pageNumbers.push(totalPages);
+      }
+    }
+
+    return pageNumbers;
+  }, [currentPage, totalPages]);
+
 
   return (
-    <SidebarProvider>
-      <Sidebar collapsible="icon">
-        <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/">
-                Home
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/interview">
-                <MessageSquare className="w-4 h-4"/>
-                Interview
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/resume">
-                <FileIcon className="w-4 h-4"/>
-                Resume
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/jobs">
-                <ListChecks className="w-4 h-4"/>
-                Jobs
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/progress">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-bar-chart-4"
-                >
-                  <path d="M3 3v18h18"/>
-                  <path d="M7 11V5"/>
-                  <path d="M11 19V8"/>
-                  <path d="M15 15V3"/>
-                  <path d="M19 10v5"/>
-                </svg>
-                Progress
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/profile">
-                <User className="w-4 h-4"/>
-                Profile
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/settings">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-settings"
-                >
-                  <path
-                    d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
-                </svg>
-                Settings
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
+    
+      
+        
+          
+            
+              Home
+            
+          
+          
+            
+              <MessageSquare className="w-4 h-4"/>
+              Interview
+            
+          
+          
+            
+              <FileIcon className="w-4 h-4"/>
+              Resume
+            
+          
+          
+            
+              <ListChecks className="w-4 h-4"/>
+              Jobs
+            
+          
+          
+            
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-bar-chart-4"
+              >
+                <path d="M3 3v18h18"/>
+                <path d="M7 11V5"/>
+                <path d="M11 19V8"/>
+                <path d="M15 15V3"/>
+                <path d="M19 10v5"/>
+              </svg>
+              Progress
+            
+          
+          
+            
+              <User className="w-4 h-4"/>
+              Profile
+            
+          
+          
+            
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-settings"
+              >
+                <path
+                  d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
+              </svg>
+              Settings
+            
+          
+        
+      
 
-      <div className="jobs-page">
+      
         <header className="jobs-header">
-          <CardTitle className="text-2xl font-bold">Job Listings</CardTitle>
+          <h1 className="text-2xl font-bold">Job Listings</h1>
           <Button variant="ghost" onClick={handleBackToHome} className="back-button">
             <ArrowLeft className="mr-2"/>
             Back to Home
@@ -366,15 +378,15 @@ const JobsPage = () => {
                   <label>Experience Level</label>
                   <div className="checkbox-group">
                     {experienceLevels.map(level => (
-                      <label key={level.value} className="checkbox-item">
-                        <input
+                      
+                        
                           type="checkbox"
                           value={level.value}
                           checked={filters.experience.includes(level.value)}
                           onChange={() => toggleFilter('experience', level.value)}
                         />
                         {level.label}
-                      </label>
+                      
                     ))}
                   </div>
                 </div>
@@ -383,15 +395,15 @@ const JobsPage = () => {
                   <label>Job Type</label>
                   <div className="checkbox-group">
                     {jobTypes.map(type => (
-                      <label key={type.value} className="checkbox-item">
-                        <input
+                      
+                        
                           type="checkbox"
                           value={type.value}
                           checked={filters.jobType.includes(type.value)}
                           onChange={() => toggleFilter('jobType', type.value)}
                         />
                         {type.label}
-                      </label>
+                      
                     ))}
                   </div>
                 </div>
@@ -414,15 +426,15 @@ const JobsPage = () => {
                   <label>Date Posted</label>
                   <div className="radio-group">
                     {datePostedOptions.map(option => (
-                      <label key={option.value} className="radio-item">
-                        <input
+                      
+                        
                           type="radio"
                           value={option.value}
                           checked={filters.datePosted === option.value}
                           onChange={() => setFilters({...filters, datePosted: option.value})}
                         />
                         {option.label}
-                      </label>
+                      
                     ))}
                   </div>
                 </div>
@@ -439,12 +451,12 @@ const JobsPage = () => {
               <div className="active-filters">
                 <span className="active-filters-label">Active Filters:</span>
                 {Object.entries(activeFilters).map(([key, value]) => (
-                  <div key={key} className="filter-tag">
+                  
                     <span>{getFilterLabel(key, value)}</span>
                     <button onClick={() => removeFilter(key)} className="remove-filter">
                       ×
                     </button>
-                  </div>
+                  
                 ))}
                 <Button variant="outline" onClick={clearAllFilters}>
                   Clear All
@@ -462,12 +474,18 @@ const JobsPage = () => {
                 <label>Sort by:</label>
                 <Select onValueChange={setSortOption} defaultValue={sortOption}>
                   <SelectTrigger className="sort-select">
-                    <SelectValue placeholder="Relevance"/>
+                    
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="relevance">Relevance</SelectItem>
-                    <SelectItem value="date">Most Recent</SelectItem>
-                    <SelectItem value="salary">Salary (high to low)</SelectItem>
+                    
+                      Relevance
+                    
+                    
+                      Most Recent
+                    
+                    
+                      Salary (high to low)
+                    
                   </SelectContent>
                 </Select>
               </div>
@@ -500,76 +518,39 @@ const JobsPage = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="pagination">
-                <Button
-                  variant="outline"
-                  className="page-button prev"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                >
-                  <ChevronLeftIcon/>
+                
+                  <ChevronLeft/>
                   Previous
-                </Button>
+                
 
-                <div className="page-numbers">
+                
                   {generatePageNumbers().map(page => (
-                    <Button
-                      key={page === '...' ? `ellipsis-${Math.random()}` : page}
-                      variant="outline"
-                      className={cn("page-number", currentPage === page ? 'active' : '')}
-                      onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                      disabled={page === '...'}
-                    >
-                      {page}
-                    </Button>
+                    
+                      
+                        {page}
+                      
+                    
                   ))}
-                </div>
+                
 
-                <Button
-                  variant="outline"
-                  className="page-button next"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                >
+                
                   Next
-                  <ChevronRightIcon/>
-                </Button>
+                  <ChevronRight/>
+                
               </div>
             )}
           </CardContent>
         </Card>
-      </div>
-    </SidebarProvider>
+      
+    
   );
-
-  function generatePageNumbers() {
-    const pageNumbers = [];
-    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-      pageNumbers.push(i);
-    }
-
-    if (pageNumbers[0] > 1) {
-      pageNumbers.unshift('...');
-      if (pageNumbers[0] !== 2) {
-        pageNumbers.unshift(1);
-      }
-    }
-
-    if (pageNumbers[pageNumbers.length - 1] < totalPages) {
-      pageNumbers.push('...');
-      if (pageNumbers[pageNumbers.length - 2] !== totalPages - 1) {
-        pageNumbers.push(totalPages);
-      }
-    }
-
-    return pageNumbers;
-  }
 };
 
 /* Placeholder Styling for Company Logo */
 const CompanyPlaceholder = ({name}) => (
-  <div className="company-logo-placeholder">
+  
     {name ? name.charAt(0).toUpperCase() : '?'}
-  </div>
+  
 );
 
 /* Circular Progress Indicator */
@@ -581,10 +562,17 @@ const CircularProgress = ({value}) => {
           '#52C41A';
 
   return (
-    <div className="circular-progress-container">
-      <svg className="circular-progress" width="40" height="40" viewBox="0 0 120 120">
-        <circle cx="60" cy="60" r="54" fill="none" stroke="#f0f2f5" strokeWidth="12"/>
-        <circle
+    
+      
+        
+          cx="60"
+          cy="60"
+          r="54"
+          fill="none"
+          stroke="#f0f2f5"
+          strokeWidth="12"
+        />
+        
           cx="60"
           cy="60"
           r="54"
@@ -596,9 +584,16 @@ const CircularProgress = ({value}) => {
           strokeLinecap="round"
           transform="rotate(-90 60 60)"
         />
-        <text x="60" y="68" textAnchor="middle" fontSize="24" fontWeight="bold" fill={color}>{value}%</text>
-      </svg>
-    </div>
+        
+          x="60"
+          y="68"
+          textAnchor="middle"
+          fontSize="24"
+          fontWeight="bold"
+          fill={color}
+        >{value}%</text>
+      
+    
   );
 };
 
@@ -607,119 +602,116 @@ const CircularProgress = ({value}) => {
 /* Style Adjustments to fit the code better */
 const JobCard = ({job, openJobDetails, toggleSaveJob, savedJobs}) => {
   return (
-    <div className="job-card">
-      <div className="job-card-header">
-        <div className="company-logo-container">
+    
+      
+        
           {job.employer_logo ? (
-            <img
+            
               src={job.employer_logo}
               alt={`${job.employer_name} logo`}
               className="company-logo"
             />
           ) : (
-            <CompanyPlaceholder name={job.employer_name}/>
+            
+              {name={job.employer_name}}/>
+            
           )}
-        </div>
+        
+        
 
-        <div className="job-header-details">
-          <h3 className="job-title">{job.job_title}</h3>
-          <div className="company-name">{job.employer_name}</div>
-          <div className="job-location">
+          
+          
+            {job.job_title}
+          
+          
+            {job.employer_name}
+          
+          
             <LocationPinIcon/>
             <span>{job.job_city}, {job.job_state}</span>
-            {job.job_is_remote && <span className="remote-badge">Remote</span>}
-          </div>
-        </div>
+            {job.job_is_remote && <span>Remote</span>}
+          
+        
 
-        <button
-          className={`save-job-button ${savedJobs.includes(job.job_id) ? 'saved' : ''}`}
-          onClick={() => toggleSaveJob(job.job_id)}
-        >
-          <BookmarkIcon/>
-        </button>
-      </div>
+        
+          
+        
+      
 
-      <div className="job-card-body">
-        <div className="job-highlights">
+      
+        
           {job.job_employment_type && (
-            <div className="highlight-item">
-              <BriefcaseIcon/>
-              <span>{formatEmploymentType(job.job_employment_type)}</span>
-            </div>
+            
+              
+              {formatEmploymentType(job.job_employment_type)}
+              
+            
           )}
 
           {job.job_salary_period && job.job_salary && (
-            <div className="highlight-item">
-              <SalaryIcon/>
-              <span>{formatSalary(job.job_salary, job.job_salary_period)}</span>
-            </div>
+            
+              
+              {formatSalary(job.job_salary, job.job_salary_period)}
+              
+            
           )}
 
-          <div className="highlight-item">
-            <CalendarIcon/>
-            <span>{formatDate(job.job_posted_at_timestamp)}</span>
-          </div>
-        </div>
+          
+            
+            {formatDate(job.job_posted_at_timestamp)}
+            
+          
+        
 
-        <div className="job-description">
-          <p>{truncateText(job.job_description, 200)}</p>
-        </div>
-
-        <div className="job-skills">
+        
           {job.job_required_skills && job.job_required_skills.slice(0, 5).map(skill => (
-            <span key={skill} className="skill-tag">{skill}</span>
+            
+              {skill}
+            
           ))}
           {job.job_required_skills && job.job_required_skills.length > 5 && (
-            <span className="more-skills">+{job.job_required_skills.length - 5} more</span>
+            
+              +{job.job_required_skills.length - 5} more
+            
           )}
-        </div>
-      </div>
+        
+      
 
-      <div className="job-card-footer">
-        <Button
-          variant="secondary"
-          onClick={() => openJobDetails(job)}
-        >
+      
+        
           View Details
-        </Button>
+        
 
-        <a
-          href={job.job_apply_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="apply-button"
-        >
+        
           Apply Now
-        </a>
-      </div>
-    </div>
+        
+      
+    
   );
 };
 
 const JobCardSkeleton = () => (
-  <div className="job-card skeleton">
-    <div className="job-card-header">
-      <div className="company-logo-container skeleton"/>
-      <div className="job-header-details">
-        <h3 className="job-title skeleton"/>
-        <div className="company-name skeleton"/>
-        <div className="job-location skeleton"/>
-      </div>
-      <button className="save-job-button skeleton"/>
-    </div>
-    <div className="job-card-body">
-      <div className="job-highlights">
-        <div className="highlight-item skeleton"/>
-        <div className="highlight-item skeleton"/>
-      </div>
-      <div className="job-description skeleton"/>
-      <div className="job-skills skeleton"/>
-    </div>
-    <div className="job-card-footer">
-      <button className="view-details-button skeleton"/>
-      <button className="apply-button skeleton"/>
-    </div>
-  </div>
+  
+    
+      
+      
+      
+      
+      
+    
+    
+      
+      
+      
+      
+      
+    
+    
+      
+      
+      
+    
+  
 );
 
 // Implement the JSearch API function to fetch and cache jobs daily
@@ -743,6 +735,11 @@ async function getJobListings(searchParams, filters, page = 1, sort = 'relevance
     };
 
     const response = await axios.request(options);
+    
+    if (response.status !== 200) {
+      throw new Error(`API request failed with status: ${response.status}`);
+    }
+    
     const data = response.data;
     return data;
 
@@ -782,3 +779,4 @@ const toggleSaveJob = (jobId) => {
 };
 
 export default JobsPage;
+
