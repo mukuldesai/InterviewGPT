@@ -9,9 +9,9 @@ import {generateInterviewQuestions} from '@/ai/flows/generate-interview-question
 import {AnalyzeInterviewResponseInput, analyzeInterviewResponse} from '@/ai/flows/analyze-interview-response';
 import {AnalyzeVoiceInputInput, analyzeVoiceInput} from '@/ai/flows/analyze-voice-input';
 import {useToast} from '@/hooks/use-toast';
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 import {useRouter} from 'next/navigation';
 import {ArrowLeft} from "lucide-react";
+import {Input} from "@/components/ui/input";
 
 
 const InterviewPage = () => {
@@ -25,41 +25,19 @@ const InterviewPage = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
   const {toast} = useToast();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState(false);
+  const [transcription, setTranscription] = useState<string>('');
+  const [recordingError, setRecordingError] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
 
   const router = useRouter();
-
-
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
-        setHasCameraPermission(true);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this app.',
-        });
-      }
-    };
-
-    getCameraPermission();
-  }, []);
-
 
   const handleGenerateQuestions = async () => {
     if (!jobRole || !experienceLevel) {
       toast({
         title: 'Error',
-        description: 'Please select a job role and experience level.',
+        description: 'Please enter a job role and select an experience level.',
         variant: 'destructive',
       });
       return;
@@ -69,7 +47,7 @@ const InterviewPage = () => {
       const questions = await generateInterviewQuestions({
         jobRole,
         experienceLevel,
-        numQuestions: 5, // You can adjust the number of questions
+        numQuestions: 5,
       });
       setGeneratedQuestions(questions.questions);
       setCurrentQuestionIndex(0);
@@ -134,22 +112,68 @@ const InterviewPage = () => {
     }
   };
 
-  const startRecording = () => {
+  const startRecording = async () => {
+    setRecordingError(null);
+    setTranscription('');
     setIsRecording(true);
     setAudioDataUri(null);
-    // Implement audio recording logic here (using MediaRecorder or similar)
-    // For simplicity, let's assume it records and sets audioDataUri
-    // This is a placeholder, replace with actual recording implementation
-    setTimeout(() => {
-      const dummyAudioDataUri = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAwF0AAIBRAHAAFEF0YWQAAQAQAgACFEF0YXRhAgAA'; // Dummy audio data URI
-      setAudioDataUri(dummyAudioDataUri);
+    audioChunksRef.current = [];
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      if (!stream) {
+        setRecordingError('No audio stream available.');
+        setIsRecording(false);
+        return;
+      }
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {type: 'audio/wav'});
+        const audioDataUrl = URL.createObjectURL(audioBlob);
+        setAudioDataUri(audioDataUrl);
+        setIsRecording(false);
+      };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder Error: ', event);
+        setRecordingError('Error recording audio.');
+        setIsRecording(false);
+      };
+
+      mediaRecorder.start();
+      toast({
+        title: 'Recording Started',
+        description: 'Recording in progress...',
+      });
+    } catch (error: any) {
+      console.error('Error accessing microphone:', error);
+      setRecordingError('Microphone access denied. Please allow microphone access in your browser settings.');
       setIsRecording(false);
       toast({
-        title: 'Recording Complete',
+        title: 'Microphone Access Denied',
+        description: 'Please enable microphone permissions in your browser settings to use this feature.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      toast({
+        title: 'Recording Stopped',
         description: 'Audio recording finished.',
       });
-    }, 5000); // Simulating recording for 5 seconds
+    }
   };
+
 
   const handleAnalyzeVoice = async () => {
     if (!audioDataUri) {
@@ -167,6 +191,7 @@ const InterviewPage = () => {
       };
       const voiceAnalysisResult = await analyzeVoiceInput(input);
       setVoiceAnalysis(voiceAnalysisResult);
+      setTranscription(voiceAnalysisResult.transcription);
       toast({
         title: 'Voice Analysis Complete',
         description: 'Your voice input has been analyzed.',
@@ -192,24 +217,19 @@ const InterviewPage = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold">Interview Practice</CardTitle>
             <Button variant="ghost" onClick={handleBackToHome}>
-              <ArrowLeft className="mr-2" />
+              <ArrowLeft className="mr-2"/>
               Back to Home
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <Select onValueChange={setJobRole}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Job Role"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Software Engineer">Software Engineer</SelectItem>
-                <SelectItem value="Data Scientist">Data Scientist</SelectItem>
-                <SelectItem value="Product Manager">Product Manager</SelectItem>
-                <SelectItem value="Project Manager">Project Manager</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              type="text"
+              placeholder="Enter Job Role"
+              value={jobRole}
+              onChange={e => setJobRole(e.target.value)}
+            />
 
             <Select onValueChange={setExperienceLevel}>
               <SelectTrigger>
@@ -286,25 +306,21 @@ const InterviewPage = () => {
               <Button onClick={startRecording} disabled={isRecording} className="mb-2">
                 {isRecording ? 'Recording...' : 'Record Answer'}
               </Button>
+              {recordingError && (
+                <p className="text-red-500">{recordingError}</p>
+              )}
 
-              <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted />
-
-              { !(hasCameraPermission) && (
-                <Alert variant="destructive">
-                  <AlertTitle>Camera Access Required</AlertTitle>
-                  <AlertDescription>
-                    Please allow camera access to use this feature.
-                  </AlertDescription>
-                </Alert>
-              )
-              }
+              <Button onClick={stopRecording} disabled={!isRecording} className="mb-2">
+                Stop Recording
+              </Button>
 
               {audioDataUri && (
                 <Button onClick={handleAnalyzeVoice}>Analyze Voice</Button>
               )}
+
               {voiceAnalysis && (
                 <>
-                  <p>Transcription: {voiceAnalysis.transcription}</p>
+                  <p>Transcription: {transcription}</p>
                   <p>Confidence Level: {voiceAnalysis.confidenceLevel}</p>
                   <p>Filler Word Count: {voiceAnalysis.fillerWordCount}</p>
                   <p>Feedback: {voiceAnalysis.feedback}</p>
