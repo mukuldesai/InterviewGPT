@@ -197,7 +197,7 @@ const JobsPage = () => {
                     <SelectValue placeholder="Experience Level"/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
+                    <SelectItem value="any">Any</SelectItem>
                     {experienceLevels.map(level => (
                       <SelectItem key={level.value} value={level.value}>
                         {level.label}
@@ -305,4 +305,3 @@ const JobCard: React.FC<JobCardProps> = ({job}) => {
 };
 
 export default JobsPage;
-
