@@ -40,6 +40,8 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {jsPDF} from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const resumeFormSchema = z.object({
   resumeFile: z.any(),
