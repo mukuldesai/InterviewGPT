@@ -31,6 +31,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Bookmark as BookmarkIcon,
+  Money as MoneyIcon
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -48,14 +49,6 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {Label} from "@/components/ui/label";
 
 import axios from "axios";
-import {
-  FIREBASE_API_KEY,
-  FIREBASE_APP_ID,
-  FIREBASE_AUTH_DOMAIN,
-  FIREBASE_MESSAGING_SENDER_ID,
-  FIREBASE_PROJECT_ID,
-  FIREBASE_STORAGE_BUCKET,
-} from "@/app/config";
 
 import './jobs.css';
 
@@ -249,22 +242,22 @@ const JobsPage = () => {
             </SidebarMenuButton>
           
           
-            
-              <MessageSquare className="w-4 h-4"/>
+            <SidebarMenuButton href="/interview">
+              <MessageSquare  className="w-4 h-4"/>
               Interview
-            
+            </SidebarMenuButton>
           
           
-            
+            <SidebarMenuButton href="/resume">
               <FileIcon className="w-4 h-4"/>
               Resume
-            
+            </SidebarMenuButton>
           
           
-            
+            <SidebarMenuButton href="/jobs">
               <ListChecks className="w-4 h-4"/>
               Jobs
-            
+            </SidebarMenuButton>
           
           
             
@@ -276,13 +269,13 @@ const JobsPage = () => {
                 <path d="M19 10v5"/>
               
               Progress
-            
+            </SidebarMenuButton>
           
           
-            
+            <SidebarMenuButton href="/profile">
               <User className="w-4 h-4"/>
               Profile
-            
+            </SidebarMenuButton>
           
           
             
@@ -291,7 +284,7 @@ const JobsPage = () => {
                   d="M12.22 2.16a8.5 8.5 0 0 1 6.36 6.36 8.5 8.5 0 0 1-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 1-6.36-6.37 8.5 8.5 0 0 1 1.15-2.48m2.48-1.14a8.5 8.5 0 0 0 6.36 6.37 8.5 8.5 0 0 0-1.15 2.48m-2.48 1.15a8.5 8.5 0 0 0-6.36-6.36 8.5 8.5 0 0 0 1.15-2.48M12 14.5V17m0-5 0 5M12 6.5V9m0 8V22m6.36-6.36a8.5 8.5 0 0 1-2.48-1.15"/>
                 Settings
               
-            
+            </SidebarMenuButton>
           
         
       
@@ -768,7 +761,7 @@ async function getJobListings(searchParams, filters, page = 1, sort = 'relevance
 
     const response = await axios.request(options);
     
-    if (response.status !== 200) {
+    if (response.status !== 200 && response.status !== 201 ) {
       throw new Error(`API request failed with status: ${response.status}`);
     }
     
@@ -855,6 +848,10 @@ function CircularProgress({value}) {
     
   );
 };
+
+
+
+
 
 
 
