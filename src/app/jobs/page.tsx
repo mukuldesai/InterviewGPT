@@ -25,16 +25,17 @@ import {
   ListChecks,
   MessageSquare,
   User,
-  MapPin,
-  Briefcase,
-  Calendar,
-  Link,
+  MapPin as LocationPinIcon,
+  Briefcase as BriefcaseIcon,
+  Calendar as CalendarIcon,
+  Link as LinkIcon,
   Search as SearchIcon,
   Filter as FilterIcon,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Bookmark as BookmarkIcon,
+  Salary as SalaryIcon,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -71,6 +72,8 @@ import {
   FIREBASE_PROJECT_ID,
   FIREBASE_STORAGE_BUCKET,
 } from "@/app/config";
+
+import './jobs.css';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -749,6 +752,33 @@ async function getJobListings(searchParams, filters, page = 1, sort = 'relevance
   }
 }
 
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+}
+
+function formatEmploymentType(type) {
+  return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function formatSalary(salary, period) {
+  return `$${salary}/${period}`;
+}
+
+function formatDate(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString();
+}
+const openJobDetails = (job) => {
+  // Implement logic to display full job details (modal, separate page, etc.)
+  console.log('Opening job details for:', job);
+  // For now, just logging to console
+};
+
+const toggleSaveJob = (jobId) => {
+  // Implement logic to save jobs for logged-in users
+  console.log('Toggling saved job for:', jobId);
+  // For now, just logging to console
+};
+
 export default JobsPage;
-
-
