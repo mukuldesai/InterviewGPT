@@ -1,4 +1,8 @@
 /**
+ * @fileOverview Defines the JobListing interface and getJobListings service.
+ */
+
+/**
  * Represents a job listing.
  */
 export interface JobListing {

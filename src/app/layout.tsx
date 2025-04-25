@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'InterviewGPT - Generative Preparation Trainer',
+  title: 'InterviewGPT - Ace Your Interviews',
   description: 'AI-Powered Interview Coach & Resume Optimizer',
 };
 
@@ -33,6 +33,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
-    

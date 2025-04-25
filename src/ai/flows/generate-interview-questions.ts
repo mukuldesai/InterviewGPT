@@ -62,7 +62,6 @@ const generateInterviewQuestionsFlow = ai.defineFlow<
     numQuestions: input.numQuestions
   });
   return {
-    questions: output!.questions,
+    questions: Array.from({ length: input.numQuestions }, (_, i) => output!.questions[i] || `Question ${i + 1}`),
   };
 });
-

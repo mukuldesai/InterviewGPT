@@ -1,3 +1,4 @@
+'use client';
 
 import {
   SidebarProvider,
@@ -16,8 +17,19 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Clock, File, ListChecks, MessageSquare, User} from "lucide-react";
 import React from "react";
 import {Progress} from "@/components/ui/progress";
+import {useRouter} from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+
+  const handleInterviewPractice = () => {
+    router.push('/interview');
+  };
+
+  const handleResumeAnalysis = () => {
+    router.push('/resume');
+  };
+
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -71,6 +83,29 @@ export default function Home() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
+              <SidebarMenuButton href="/progress">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-bar-chart-4"
+                >
+                  <path d="M3 3v18h18"/>
+                  <path d="M7 11V5"/>
+                  <path d="M11 19V8"/>
+                  <path d="M15 15V3"/>
+                  <path d="M19 10v5"/>
+                </svg>
+                Progress
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
               <SidebarMenuButton href="/profile">
                 <User className="w-4 h-4"/>
                 Profile
@@ -96,29 +131,6 @@ export default function Home() {
                 Settings
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton href="/progress">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-bar-chart-4"
-                >
-                  <path d="M3 3v18h18"/>
-                  <path d="M7 11V5"/>
-                  <path d="M11 19V8"/>
-                  <path d="M15 15V3"/>
-                  <path d="M19 10v5"/>
-                </svg>
-                Progress
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -137,8 +149,8 @@ export default function Home() {
           <h1 className="text-2xl font-bold">Welcome to InterviewGPT</h1>
           <p className="text-muted-foreground">Your AI-powered interview coach and resume optimizer</p>
           <div className="flex justify-start space-x-4">
-            <Button>Start Interview Practice</Button>
-            <Button variant="outline">Analyze Resume</Button>
+            <Button onClick={handleInterviewPractice}>Start Interview Practice</Button>
+            <Button variant="outline" onClick={handleResumeAnalysis}>Analyze Resume</Button>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
