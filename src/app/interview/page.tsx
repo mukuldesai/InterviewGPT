@@ -265,7 +265,7 @@ const InterviewPage = () => {
                   {jobRoles.map(role => (
                     <Button
                       key={role.label}
-                      variant={jobRole === role.label ? 'primary' : 'secondary'}
+                      variant={jobRole === role.label ? 'default' : 'secondary'}
                       onClick={() => setJobRole(role.label)}
                     >
                       {role.icon} {role.label}

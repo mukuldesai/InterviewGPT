@@ -1,0 +1,27 @@
+{
+  "node": {
+    "40644ab7464d39e411ba34a172030752072a197ecc": {
+      "workers": {
+        "app/interview/page": {
+          "moduleId": "[project]/.next-internal/server/app/interview/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/generate-interview-questions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/analyze-interview-response.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/interview/page": "action-browser"
+      }
+    },
+    "40eebd2691f5bd401c3b32c73196fc84099ff0d9ab": {
+      "workers": {
+        "app/interview/page": {
+          "moduleId": "[project]/.next-internal/server/app/interview/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/generate-interview-questions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/analyze-interview-response.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/interview/page": "action-browser"
+      }
+    }
+  },
+  "edge": {}
+}

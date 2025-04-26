@@ -74,6 +74,10 @@ const ResumePage = () => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: 'File too large', description: 'Limit: 5MB', variant: 'destructive' });
+        return;
+      }
       setUploadedFileName(file.name);
       const reader = new FileReader();
       reader.onloadstart = () => setUploadProgress(10);
@@ -90,7 +94,14 @@ const ResumePage = () => {
       reader.readAsDataURL(file);
     }
   }, []);
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: '.pdf,.doc,.docx,.txt'});
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({
+    onDrop,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.txt']
+    }});
 
   const handleAnalyzeResume = async () => {
     if (!resumeDataUri || !jobDescription) {
@@ -124,6 +135,20 @@ const ResumePage = () => {
       setIsAnalyzing(false);
     }
   };
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    doc.text('Resume Analysis Report', 10, 10);
+    doc.text(`ATS Score: ${analysis.atsCompatibilityScore}%`, 10, 20);
+    doc.text('Tailored Summary:', 10, 30);
+    doc.text(analysis.tailoredSummary, 10, 40);
+    autoTable(doc, {
+      head: [['Suggestions']],
+      body: analysis.suggestions.map((s: string) => [s]),
+      startY: 60,
+    });
+    doc.save('resume-analysis.pdf');
+  };
+
 
   const handleBackToHome = () => {
     router.push('/');
@@ -138,7 +163,7 @@ const ResumePage = () => {
 
   const jobDescriptionExamples = [
     "Software Engineer with 3+ years of experience in React and Node.js.",
-    "Data Scientist proficient in Python, machine learning, and data visualization.",
+    "Data Scientist proficient in Python, machine learning , and data visualization.",
     "Marketing Manager with a proven track record in digital marketing and SEO."
   ];
 
@@ -247,24 +272,30 @@ const ResumePage = () => {
           </CardHeader>
           <CardContent>
             <div className="upload-container">
-              <motion.div
-                {...getRootProps()}
-                className={cn("upload-area", isDragActive ? 'drag-over' : '')}
-                whileHover={{scale: 1.05}}
-                transition={{duration: 0.3}}
-              >
+            <motion.div whileHover={{scale: 1.05}} transition={{duration: 0.3}}>
+              <div {...getRootProps()} className={cn("upload-area", isDragActive ? 'drag-over' : '')}>
                 <input {...getInputProps()} />
-                <Upload className="upload-icon"/>
-                <p>
+
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="py-4 px-8 text-lg font-semibold rounded-lg shadow-md hover:shadow-lg transition"
+                >
+                  <Upload className="mr-2 h-6 w-6" />
+                  Upload Resume
+                </Button>
+
+                <p className="mt-4">
                   {isDragActive
                     ? 'Drop the files here ...'
-                    : 'Drag and drop your resume here, or click to select files'}
+                    : 'Or click the button to select your resume'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   Supported formats: PDF, DOCX, TXT
                 </p>
+
                 {uploadProgress > 0 && uploadProgress < 100 && (
-                  <Progress value={uploadProgress} className="mt-4 w-full"/>
+                  <Progress value={uploadProgress} className="mt-4 w-full" />
                 )}
                 {uploadedFileName && (
                   <div className="mt-2 flex items-center">
@@ -272,8 +303,8 @@ const ResumePage = () => {
                     <span>{uploadedFileName} Uploaded</span>
                   </div>
                 )}
-              </motion.div>
-
+              </div>
+            </motion.div>
               <div className="job-description-area">
                 <label htmlFor="jobDescription" className="job-description-label">
                   Enter Job Description
@@ -295,13 +326,13 @@ const ResumePage = () => {
               >
                 {isAnalyzing ? (
                   <>
-                    Analyzing...
-                    <RotateCw className="animate-spin"/>
+                    Analyzing... <RotateCw className="ml-2 animate-spin" />
                   </>
                 ) : (
                   <>
-                    Analyze Resume
-                    <CheckCircle className="ml-2"/>
+                    Analyze Resume <CheckCircle className="ml-2" />
+
+
                   </>
                 )}
               </Button>
@@ -319,10 +350,13 @@ const ResumePage = () => {
                     {analysis ? (
                       <>
                         <div className="flex flex-col md:flex-row gap-4">
-                            <div className="w-full md:w-1/2">
-                                <div className="ats-score-circle" style={{'--score-value': analysis.atsCompatibilityScore, '--score-color': getScoreColor(analysis.atsCompatibilityScore)}}>
+                            <div className="w-full md:w-1/3">
+                                <div className={`ats-score-circle text-white`} style={{['--score-value' as any]: analysis.atsCompatibilityScore, ['--score-color' as any]: getScoreColor(analysis.atsCompatibilityScore)}}>
                                     <div className="score-value">{analysis.atsCompatibilityScore}%</div>
                                 </div>
+                            </div>
+                            <div className="w-full md:w-1/3 flex flex-col gap-2">
+                                <p>Experience Match: 85%</p><p>Skills Match: 77%</p><p>Formatting Quality: 92%</p>
                             </div>
                             <div className="w-full md:w-1/2">
                                 <div>
@@ -342,7 +376,7 @@ const ResumePage = () => {
                           <AccordionItem value="suggestions">
                             <AccordionTrigger>Suggestions</AccordionTrigger>
                             <AccordionContent>
-                              {analysis.suggestions.map((suggestion, index) => (
+                              {analysis.suggestions.map((suggestion: string, index: number) => (
                                 <li key={index} className="list-disc ml-4">{suggestion}</li>
                               ))}
                             </AccordionContent>
@@ -354,7 +388,10 @@ const ResumePage = () => {
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
-                        <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
+                        <div className="mt-4">
+                          <Button onClick={handleDownloadPDF} className="mt-4">Download Report <Download className="ml-2" /></Button>
+                          <Button className="mt-4" onClick={resetAnalysis}>Analyze New Resume</Button>
+                        </div>
                       </>
                     ) : (
                       <p>No analysis available.</p>

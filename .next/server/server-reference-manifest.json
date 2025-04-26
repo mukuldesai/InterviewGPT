@@ -1,0 +1,28 @@
+{
+  "node": {
+    "403c5512003fdc9d84163eb4859bf8f597682ee7e6": {
+      "workers": {
+        "app/resume/page": {
+          "moduleId": "[project]/.next-internal/server/app/resume/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/optimize-resume.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/resume/page": "action-browser"
+      }
+    },
+    "409f2fb22af33e92f243518b2eee1f47b0e9f1a4d5": {
+      "workers": {
+        "app/jobs/page": {
+          "moduleId": "[project]/.next-internal/server/app/jobs/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions/jobActions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/jobs/page": "action-browser"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "vfl5uAf2YQIW7SVvflEO8Nc+qVUQWr3g+rOpUzh3edg="
+}

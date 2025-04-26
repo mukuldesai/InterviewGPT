@@ -119,11 +119,11 @@ const SettingsPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Name</Label>
-              <Input type="text" id="name" defaultValue="John Doe"/>
+              <Input type="text" id="name" defaultValue="Mukul Desai"/>
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input type="email" id="email" defaultValue="john.doe@example.com"/>
+              <Input type="email" id="email" defaultValue="mukul.desai12@gmail.com"/>
             </div>
             <div>
               <Button>Update Profile</Button>

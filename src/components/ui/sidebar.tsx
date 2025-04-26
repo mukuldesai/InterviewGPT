@@ -110,7 +110,7 @@ const SidebarProvider = React.forwardRef<
       }
 
       window.addEventListener("keydown", handleKeyDown)
-      return () => window.removeEventListener("keydown", onChange)
+      return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
@@ -452,7 +452,7 @@ SidebarGroupLabel.displayName = "SidebarGroupLabel"
 
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<"button"> & { asChild?: boolean }
+  React.ComponentProps<"button"> & { asChild?: boolean,showOnHover?: boolean }
 >(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
 

@@ -53,10 +53,10 @@ export default function Home() {
           <SidebarGroup>
             <div className="flex flex-col items-center pt-4 pb-6">
               <Avatar className="h-16 w-16">
-                <AvatarImage src="https://picsum.photos/200/200" alt="Guest User"/>
+                <AvatarImage src="https://picsum.photos/200/200" alt="Mukul Desai"/>
                 <AvatarFallback>GU</AvatarFallback>
               </Avatar>
-              <p className="text-sm font-medium mt-2">Guest User</p>
+              <p className="text-sm font-medium mt-2">Mukul Desai</p>
             </div>
           </SidebarGroup>
           <SidebarMenu>
