@@ -1,4 +1,4 @@
-# InterviewGPT
+# InterviewGPT - Interview Generative Preparation Trainer
 
 InterviewGPT
 InterviewGPT is a web-based application designed to assist users in preparing for job interviews by leveraging the capabilities of generative AI. It offers personalized interview simulations, feedback, and resources to enhance interview readiness.
