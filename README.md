@@ -1,156 +1,115 @@
-# InterviewGPT - Interview Generative Preparation Trainer
+# InterviewGPT — AI Interview Preparation Platform
 
-InterviewGPT
-InterviewGPT is a web-based application designed to assist users in preparing for job interviews by leveraging the capabilities of generative AI. It offers personalized interview simulations, feedback, and resources to enhance interview readiness.
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)](https://react.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-DD2C00?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com)
+[![OpenAI](https://img.shields.io/badge/OpenAI_GPT--4o-412991?style=flat&logo=openai&logoColor=white)](https://openai.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
-🚀 Features
-AI-Powered Interview Simulations: Engage in mock interviews with AI-generated questions tailored to specific roles and industries.
+Full-stack AI-powered interview preparation platform. Generates role-specific interview questions using GPT-4o, analyzes resumes with quality scoring, and tracks performance improvement over time.
 
-Real-Time Feedback: Receive instant feedback on responses to improve performance.
+🔗 **[Live Demo](https://interview-gpt-qbxh.vercel.app)**
 
-Resource Library: Access a curated collection of articles, tips, and best practices for interview preparation.
+---
 
-User Profiles: Track progress over time and revisit previous interview sessions.
+## Features
 
-Responsive Design: Optimized for both desktop and mobile devices.
+**Dynamic Interview Simulator**
+- Role and industry-specific question generation using GPT-4o
+- Behavioral, technical, and situational question types
+- Real-time AI feedback on responses with actionable suggestions
 
-🛠️ Tech Stack
-Frontend: Next.js, React, TypeScript, Tailwind CSS
+**AI Resume Analyzer**
+- Resume quality scoring with gap identification
+- Section-by-section improvement recommendations
+- ATS keyword analysis
 
-Backend: Firebase (Authentication, Firestore, Cloud Functions)
+**Progress Dashboard**
+- Session history with performance trends
+- Improvement tracking across question categories
+- Exportable session summaries
 
-AI Integration: OpenAI GPT-4 API
+**Profile Management**
+- Application tracker with status management
+- Session bookmarking and review
 
-Deployment: Vercel
+---
 
-📦 Installation
-To set up the project locally:
+## Tech Stack
 
-Clone the repository:
+| Layer | Tool |
+|---|---|
+| Frontend | Next.js 14, React, TypeScript, Tailwind CSS |
+| Backend | Firebase (Firestore, Auth, Cloud Functions) |
+| AI | OpenAI GPT-4o, Google Gemini 2.0 Flash |
+| Deployment | Vercel |
 
-bash
-Copy
-Edit
-git clone https://github.com/mukuldesai/InterviewGPT.git
+---
+
+## Project Structure
+
+```
+InterviewGPT/
+├── app/
+│   ├── (auth)/               # Authentication pages
+│   ├── dashboard/            # Main user dashboard
+│   ├── interview/            # Interview simulator
+│   └── profile/              # User profile management
+├── components/
+│   ├── ui/                   # Reusable UI components
+│   ├── interview/            # Interview-specific components
+│   └── dashboard/            # Dashboard widgets
+├── lib/
+│   ├── firebase.ts           # Firebase configuration
+│   ├── openai.ts             # GPT-4o integration
+│   └── utils.ts
+├── public/
+├── tailwind.config.ts
+└── package.json
+```
+
+---
+
+## Setup
+
+```bash
+git clone https://github.com/mukuldesai/InterviewGPT
 cd InterviewGPT
-Install dependencies:
-
-bash
-Copy
-Edit
 npm install
-Set up environment variables:
+```
 
-Create a .env.local file in the root directory and add the following variables:
-
-env
-Copy
-Edit
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+Create `.env.local`:
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
-Replace the placeholder values with your actual Firebase and OpenAI credentials.
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_key
+```
 
-Run the development server:
-
-bash
-Copy
-Edit
+```bash
 npm run dev
-The application will be available at http://localhost:3000.
+# Visit http://localhost:3000
+```
 
-🌐 Live Demo
-Experience the application live at: https://interview-gpt-qbxh.vercel.app/
+---
 
-⚙️ Deployment
-The project is deployed on Vercel. To deploy your own instance:
+## Deployment
 
-Push the code to GitHub:
+This project deploys automatically to Vercel on push to `main`. To deploy your own instance:
 
-Ensure your local repository is connected to GitHub and push your changes:
+1. Fork this repository
+2. Connect to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
 
-bash
-Copy
-Edit
-git add .
-git commit -m "Initial commit"
-git push origin main
-Import the project to Vercel:
+---
 
-Go to Vercel and sign in.
+## Author
 
-Click on "New Project" and import your GitHub repository.
+**Mukul Desai** — Data Engineer
 
-During the setup, add the necessary environment variables as specified above.
-
-Click "Deploy" to initiate the deployment process.
-
-🧪 Usage
-Once deployed:
-
-Navigate to the live application URL.
-
-Sign up or log in using your credentials.
-
-Start a new interview simulation by selecting your desired role and industry.
-
-Answer the AI-generated questions and receive feedback.
-
-Explore the resource library for additional preparation materials.
-
-📁 Project Structure
-ruby
-Copy
-Edit
-InterviewGPT/
-├── components/ # Reusable UI components
-├── pages/ # Next.js pages
-├── public/ # Static assets
-├── styles/ # Global styles
-├── utils/ # Utility functions
-├── .env.local # Environment variables
-├── next.config.js # Next.js configuration
-├── tailwind.config.js # Tailwind CSS configuration
-└── package.json # Project metadata and scripts
-🤝 Contributing
-Contributions are welcome! To contribute:
-
-Fork the repository.
-
-Create a new branch:
-
-bash
-Copy
-Edit
-git checkout -b feature/your-feature-name
-Make your changes and commit them:
-
-bash
-Copy
-Edit
-git commit -m "Add your message here"
-Push to your forked repository:
-
-bash
-Copy
-Edit
-git push origin feature/your-feature-name
-Open a pull request on the main repository.
-
-Please ensure your code adheres to the project's coding standards and includes appropriate tests.
-
-📄 License
-This project is licensed under the MIT License.
-
-🙏 Acknowledgments
-OpenAI for providing the GPT-4 API.
-
-Firebase for backend services.
-
-Vercel for deployment infrastructure.
-
-Tailwind CSS for utility-first CSS framework.
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-mukuldesai-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/mukuldesai)
+[![Portfolio](https://img.shields.io/badge/Portfolio-mukuldesai.vercel.app-000000?style=flat&logo=vercel&logoColor=white)](https://mukuldesai.vercel.app)
